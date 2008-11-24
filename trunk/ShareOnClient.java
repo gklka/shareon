@@ -21,9 +21,10 @@ public class ShareOnClient {
 
         try 
             {
-            echoSocket = new Socket("89.132.127.137", 30000);
+            echoSocket = new Socket("localhost", 30000);
             out = new PrintWriter(echoSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
+            System.out.println("Connection established!\n");
             } 
         catch (UnknownHostException e)
             {
@@ -32,20 +33,33 @@ public class ShareOnClient {
             }
         catch (IOException e)
             {
-            System.err.println("Couldn't get I/O for the connection to: 89.132.127.137");
+            System.err.println("Couldn't get I/O for the connection to: localhost");
             System.err.println(e.toString());
             System.exit(1);
             }
 
 	BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 	String userInput;
-
-	while ((userInput = stdIn.readLine()) != null)
+        String sEcho;
+        
+	while (!(userInput = stdIn.readLine()).equals("logout"))
             {
 	    out.println(userInput);
-	    System.out.println("echo: " + in.readLine() + "\n");
+            sEcho = in.readLine();
+            if (!sEcho.equals("You are terminated!"))
+                System.out.println("Echo: " + sEcho + "\n");
+            else
+                {
+                System.out.println(sEcho + "\n");
+                out.close();
+                in.close();
+                stdIn.close();
+                echoSocket.close();
+                System.exit(2);
+                }
             }
-
+        
+        out.println("logout");
 	out.close();
 	in.close();
 	stdIn.close();
