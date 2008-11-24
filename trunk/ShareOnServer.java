@@ -15,33 +15,41 @@ import java.net.*;
 import java.io.*;
 
 public class ShareOnServer {
-  public static void main (String args[]) throws IOException {
-
-    int serverPort = 30000;
     
-    System.out.println("Establishing ShareOn server socket at port " + serverPort);
+    static final int iMaxConnections = 100;
     
-    ServerSocket serverSocket = new ServerSocket(serverPort);
-
-    // a real server would handle more than just one client like this...
-    Socket s = serverSocket.accept();
-    BufferedInputStream is = new BufferedInputStream(s.getInputStream());
-    BufferedOutputStream os = new BufferedOutputStream(s.getOutputStream());
-
-    // This server just echoes back what you send it...
-    byte buffer[] = new byte[4096];
-    int bytesRead;
-
-    // read until "eof" returned
-    while ((bytesRead = is.read(buffer)) > 0)
+    public static void main (String args[]) throws IOException
         {
-        os.write(buffer, 0, bytesRead); // write it back
-        os.flush();    // flush the output buffer
-        }
+        int serverPort = 30000;
+        int iConnections = 0;
+    
+        System.out.println("Establishing ShareOn server socket at port " + serverPort);
+    
+        ServerSocket socketListen = new ServerSocket(serverPort);
+        System.out.println("Server successfully established!");
+    
+        // this server is an indeed ultimate one, it can manage 100 connections
+        System.out.println("Awaiting connections!");
+        
+        try
+            {
+            Socket sServer;
 
-
-    s.close();
-    serverSocket.close();
-  }       // end main()
+            while(iConnections < iMaxConnections)
+                {
+                iConnections++;
+                sServer = socketListen.accept();
+                //TODO: a connection karbantartás!
+                ClientEntity clientConnecting = new ClientEntity(sServer);
+                Thread tClient = new Thread(clientConnecting);
+                tClient.start();
+                }
+            }
+            catch (IOException e)
+                {
+                System.out.println("Exception on socket listen: " + e.toString());
+                }
+    
+    }       // end main()
 
 }       // end class definition
