@@ -13,11 +13,19 @@ import java.io.*;
 import java.net.*;
 
 public class ShareOnClient {
-    public static void main(String[] args) throws IOException
+    
+    Socket echoSocket;
+    PrintWriter out;
+    BufferedReader in;
+    ClientGUI currentGUI;
+    BufferedReader stdIn;
+        
+    public ShareOnClient()
         {
-        Socket echoSocket = null;
-        PrintWriter out = null;
-        BufferedReader in = null;
+        echoSocket = null;
+        out = null;
+        currentGUI = new ClientGUI(this);
+        currentGUI.setVisible(true);
 
         try 
             {
@@ -37,8 +45,21 @@ public class ShareOnClient {
             System.err.println(e.toString());
             System.exit(1);
             }
+        
+        try 
+            {
+            runClient();
+            }
+        catch (IOException e)
+            {
+            System.err.println("IOException occured: " + e.toString());
+            System.exit(1);
+            }
+        }
 
-	BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+    private void runClient() throws IOException
+        {
+        stdIn = new BufferedReader(new InputStreamReader(System.in));
 	String userInput;
         String sEcho;
         
@@ -64,7 +85,10 @@ public class ShareOnClient {
 	in.close();
 	stdIn.close();
 	echoSocket.close();
+        System.exit(2);
+        }
+    
+    public static void main(String args[]) {
+        ShareOnClient clientInstance = new ShareOnClient();
     }
 }
-
-
