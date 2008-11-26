@@ -23,10 +23,15 @@ class ClientEntity implements Runnable
         String sFromClient;             //message received from the client
         PrintWriter pwOut = null;       //PrintWriter to wrtite
         BufferedReader buffIn = null;   //BufferedReader to read
+        ShareOnServer callerServer;
         String sLine;
 
         //save the socket in the constructor
-        ClientEntity(Socket server) { this.sServer=server; }
+        ClientEntity(Socket sServerIn, ShareOnServer callerServerIn)
+            {
+            sServer = sServerIn;
+            callerServer = callerServerIn;
+            }
 
         public void run ()
             {
@@ -41,6 +46,7 @@ class ClientEntity implements Runnable
                     pwOut.println(sLine);
                     }
                 
+                callerServer.disconnect();
                 pwOut.close();
                 buffIn.close();
                 sServer.close();
@@ -48,6 +54,13 @@ class ClientEntity implements Runnable
             catch (IOException e)
                 {
                 System.err.println("Exception occured: " + e.toString());
+                callerServer.disconnect();
+                }
+            catch (NullPointerException e)
+                {
+                System.err.println("Exception occured: " + e.toString());
+                System.err.println("Connection may be lost to a client!");
+                callerServer.disconnect();
                 }
             }
         }
