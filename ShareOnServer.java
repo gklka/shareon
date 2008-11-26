@@ -9,28 +9,32 @@ package shareonserver;
  *
  * @author Bandita
  */
-/* File simpleSocketServer.java*/
 
 import java.net.*;
 import java.io.*;
 
 public class ShareOnServer {
     
-    static final int iMaxConnections = 100;
+    private final int iMaxConnections = 100;
+    private int serverPort = 30000;
+    private int iConnections = 0;
+    private ServerSocket socketListen;
     
-    public static void main (String args[]) throws IOException
+    public ShareOnServer() throws IOException
         {
-        int serverPort = 30000;
-        int iConnections = 0;
-    
         System.out.println("Establishing ShareOn server socket at port " + serverPort);
     
-        ServerSocket socketListen = new ServerSocket(serverPort);
+        socketListen = new ServerSocket(serverPort);
         System.out.println("Server successfully established!");
     
-        // this server is an indeed ultimate one, it can manage 100 connections
+        // this server is an indeed ultimate one, it can manage up to 100 connections
         System.out.println("Awaiting connections!");
         
+        runServer();
+        }
+    
+    private void runServer()
+        {
         try
             {
             Socket sServer;
@@ -39,17 +43,32 @@ public class ShareOnServer {
                 {
                 iConnections++;
                 sServer = socketListen.accept();
-                //TODO: a connection karbantartás!
-                ClientEntity clientConnecting = new ClientEntity(sServer);
+                ClientEntity clientConnecting = new ClientEntity(sServer, this);
                 Thread tClient = new Thread(clientConnecting);
                 tClient.start();
                 }
             }
-            catch (IOException e)
-                {
-                System.out.println("Exception on socket listen: " + e.toString());
-                }
+         catch (IOException e)
+            {
+            System.err.println("Exception on socket listen: " + e.toString());
+            }
     
-    }       // end main()
+    }       // end constructor
+    
+    public void disconnect() { iConnections--; }
+    
+    public static void main (String args[])
+        {
+        try
+            {
+            ShareOnServer serverInstance = new ShareOnServer();
+            }
+        catch (IOException e)
+            {
+            System.err.println("Exception occured while establishing server: " + e.toString());
+            System.err.println("The program will now exit!");
+            System.exit(1);
+            }
+        }
 
 }       // end class definition
