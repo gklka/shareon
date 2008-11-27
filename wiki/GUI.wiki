@@ -12,5 +12,6 @@ Add your content here.  Format your content with:
   * Headings, paragraphs, and lists
   * Automatic links to other wiki pages
 
-V1 GUI:
+V1 GUI:<br/>
+http://gk.czo.hu/x/ShareOnClient%20GUI.png
 
