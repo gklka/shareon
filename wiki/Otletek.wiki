@@ -1,0 +1,5 @@
+#summary Ötletek a projekttel kapcsolatban
+
+= SQL táblák =
+
+Kéne valami dátum jellegű mező is, hogy tudjuk, hogy az adott file mikor volt utoljára elérhető.
