@@ -11,6 +11,7 @@ package shareonclient;
  */
 import java.io.*;
 import java.net.*;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 public class ShareOnClient {
@@ -36,7 +37,7 @@ public class ShareOnClient {
         //listenToPseudoPing();
         //long lTmp = pseudoPing("localhost");
         }
-
+    
     public void connectToServer()
         {
         if (bConnected)
@@ -91,6 +92,14 @@ public class ShareOnClient {
         }
     
     public boolean isConnectedToServer() { return bConnected; }
+    
+    public File chooseFile()
+        {
+        JFileChooser chooseFile = new JFileChooser();
+        chooseFile.setFileFilter(new ShareOnFileFilter());
+        chooseFile.showOpenDialog(currentGUI);
+        return chooseFile.getSelectedFile();
+        } 
     
     public long pseudoPing(String sHost)
         {

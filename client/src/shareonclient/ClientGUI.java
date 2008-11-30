@@ -10,9 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -31,6 +28,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         this.setLocation(100, 100);
         jLoginButton.addActionListener(this);
         jLogoutButton.addActionListener(this);
+        jAddShareButton.addActionListener(this);
     }
     
     //ActionListener
@@ -49,8 +47,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             }
         if (e.getSource() == jAddShareButton)
             {
-            JFileChooser chooser = new JFileChooser();
-            
+            ownerClient.chooseFile();
             }
         }
     
@@ -74,44 +71,6 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
     public void windowDeiconified(WindowEvent e) {}
     public void windowIconified(WindowEvent e) {}
     
-    // class to filter files
-    public class SimpleFileFilter extends FileFilter
-        {
-        String[] extensions;
-        String description;
-
-        public SimpleFileFilter(String ext)
-            {
-            this (new String[] {ext}, null);
-            }
-
-        public SimpleFileFilter(String[] exts, String descr)
-            {
-            // Clone and lowercase the extensions
-            extensions = new String[exts.length];
-            for (int i = exts.length - 1; i >= 0; i--)
-                { extensions[i] = exts[i].toLowerCase(); }
-            // Make sure we have a valid (if simplistic) description
-            description = (descr == null ? exts[0] + " files" : descr);
-            }
-
-        public boolean accept(File f)
-            {
-            // We always allow directories, regardless of their extension
-            if (f.isDirectory()) { return true; }
-
-            // Ok, itвЂ™s a regular file, so check the extension
-            String name = f.getName().toLowerCase();
-            for (int i = extensions.length - 1; i >= 0; i--)
-                {
-                if (name.endsWith(extensions[i]))
-                    { return true; }
-                }
-            return false;
-            }
-
-      public String getDescription() { return description; }
-      }
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
