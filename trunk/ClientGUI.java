@@ -6,11 +6,17 @@
 
 package shareonclient;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
 /**
  *
  * @author  Bandita
  */
-public class ClientGUI extends javax.swing.JFrame {
+
+public class ClientGUI extends javax.swing.JFrame implements ActionListener, WindowListener{
     
     ShareOnClient ownerClient;
     
@@ -18,8 +24,48 @@ public class ClientGUI extends javax.swing.JFrame {
     public ClientGUI(ShareOnClient ownerClientIn) {
         ownerClient = ownerClientIn;
         initComponents();
+        jSearchButton.setEnabled(false);
+        this.setLocation(100, 100);
+        jLoginButton.addActionListener(this);
+        jLogoutButton.addActionListener(this);
     }
-
+    
+    //ActionListener
+    public void actionPerformed(ActionEvent e)
+        {
+        if (e.getSource() == jLoginButton)
+            {
+            ownerClient.connectToServer();
+            if (ownerClient.isConnectedToServer())
+                jSearchButton.setEnabled(true);
+            }
+        if (e.getSource() == jLogoutButton)
+            {
+            ownerClient.disconnectFromServer();
+            jSearchButton.setEnabled(false);
+            }
+        }
+    
+    //set text to the status label
+    public void setStatusText(String sStatusToSet)
+        {
+        jStatusLabel.setText("Status: " + sStatusToSet);
+        }
+    
+    //WindowListener
+    public void windowClosed(WindowEvent e)
+        {
+        ownerClient.exit();
+        this.dispose();
+        }
+    
+    public void windowClosing(WindowEvent e) {}
+    public void windowOpened(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e) {}
+    public void windowActivated(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {}
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -31,11 +77,11 @@ public class ClientGUI extends javax.swing.JFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jHeadPanel = new javax.swing.JPanel();
-        jControlPanel = new javax.swing.JPanel();
-        jSearchButton = new javax.swing.JButton();
-        jLogoutButton = new javax.swing.JButton();
-        jSearchField = new javax.swing.JTextField();
         jStatusLabel = new javax.swing.JLabel();
+        jLoginButton = new javax.swing.JButton();
+        jLogoutButton = new javax.swing.JButton();
+        jSearchButton = new javax.swing.JButton();
+        jSearchField = new javax.swing.JTextField();
         jResultsPanel = new javax.swing.JPanel();
         jResultsScrollPane = new javax.swing.JScrollPane();
         jResultList = new javax.swing.JList();
@@ -55,44 +101,49 @@ public class ClientGUI extends javax.swing.JFrame {
         jHeadPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Controls"));
         jHeadPanel.setLayout(new java.awt.GridBagLayout());
 
-        jControlPanel.setLayout(new java.awt.GridBagLayout());
+        jStatusLabel.setText("Status:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 5.0;
+        gridBagConstraints.weighty = 1.0;
+        jHeadPanel.add(jStatusLabel, gridBagConstraints);
+
+        jLoginButton.setText("Login");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        jHeadPanel.add(jLoginButton, gridBagConstraints);
+
+        jLogoutButton.setText("Logout");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        jHeadPanel.add(jLogoutButton, gridBagConstraints);
 
         jSearchButton.setText("Search!");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        jControlPanel.add(jSearchButton, gridBagConstraints);
-
-        jLogoutButton.setText("Logout");
-        jControlPanel.add(jLogoutButton, new java.awt.GridBagConstraints());
+        gridBagConstraints.weightx = 1.0;
+        jHeadPanel.add(jSearchButton, gridBagConstraints);
 
         jSearchField.setText("Type file to search here!");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        jControlPanel.add(jSearchField, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        jHeadPanel.add(jControlPanel, gridBagConstraints);
-
-        jStatusLabel.setText("Status:");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        jHeadPanel.add(jStatusLabel, gridBagConstraints);
+        gridBagConstraints.weightx = 5.0;
+        jHeadPanel.add(jSearchField, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
@@ -188,9 +239,9 @@ public class ClientGUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jAddShareButton;
-    private javax.swing.JPanel jControlPanel;
     private javax.swing.JButton jDownloadButton;
     private javax.swing.JPanel jHeadPanel;
+    private javax.swing.JButton jLoginButton;
     private javax.swing.JButton jLogoutButton;
     private javax.swing.JButton jRemoveShareButton;
     private javax.swing.JList jResultList;

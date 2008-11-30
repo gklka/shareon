@@ -11,81 +11,162 @@ package shareonclient;
  */
 import java.io.*;
 import java.net.*;
+import javax.swing.JOptionPane;
 
 public class ShareOnClient {
     
-    Socket echoSocket;
+    Socket serverSocket;
+    ServerSocket pingListen;
     PrintWriter out;
     BufferedReader in;
     ClientGUI currentGUI;
-    BufferedReader stdIn;
+    boolean bRetry;
+    boolean bConnected;
         
     public ShareOnClient()
         {
-        echoSocket = null;
+        serverSocket = null;
         out = null;
         currentGUI = new ClientGUI(this);
         currentGUI.setVisible(true);
-
-        try 
-            {
-            echoSocket = new Socket("localhost", 30000);
-            out = new PrintWriter(echoSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
-            System.out.println("Connection established!\n");
-            } 
-        catch (UnknownHostException e)
-            {
-            System.err.println("Don't know about host: localhost.");
-            System.exit(1);
-            }
-        catch (IOException e)
-            {
-            System.err.println("Couldn't get I/O for the connection to: localhost");
-            System.err.println(e.toString());
-            System.exit(1);
-            }
+        bConnected = false;
+        currentGUI.setStatusText("offline mode");
         
-        try 
+        // listen to pseudopings from peers
+        //listenToPseudoPing();
+        //long lTmp = pseudoPing("localhost");
+        }
+
+    public void connectToServer()
+        {
+        if (bConnected)
+            return;
+        while (true)
             {
-            runClient();
+            try 
+                {
+                serverSocket = new Socket("localhost", 30000);
+                out = new PrintWriter(serverSocket.getOutputStream(), true);
+                in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+                bConnected = true;
+                break;
+                } 
+            catch (UnknownHostException e)
+                {
+                currentGUI.setStatusText("connection falied");
+                int answer = JOptionPane.showConfirmDialog(currentGUI,
+                                                           "Don't know about host: localhost.\nPress YES to try again or NO otherwise!",
+                                                           "Connection error!",
+                                                           JOptionPane.YES_NO_OPTION);
+                if (answer == JOptionPane.NO_OPTION)
+                    {
+                    currentGUI.setStatusText("offline mode");
+                    return;
+                    }
+                }
+            catch (IOException e)
+                {
+                currentGUI.setStatusText("connection falied");
+                int answer = JOptionPane.showConfirmDialog(currentGUI,
+                                                           "Couldn't get I/O for the connection to: localhost.\nPress YES to try again or NO otherwise!",
+                                                           "Connection error!",
+                                                           JOptionPane.YES_NO_OPTION);
+                if (answer == JOptionPane.NO_OPTION)
+                    {
+                    currentGUI.setStatusText("offline mode");
+                    return;
+                    }
+                }
+            }
+            currentGUI.setStatusText("connected to server");
+        }
+    
+    public void disconnectFromServer()
+        {
+        if (!bConnected)
+            return;
+        out.println("logout");
+        bConnected = false;
+        currentGUI.setStatusText("offline mode");
+        }
+    
+    public boolean isConnectedToServer() { return bConnected; }
+    
+    public long pseudoPing(String sHost)
+        {
+        long lRTT =  0;
+        try
+            {
+            Socket p2pSocket = new Socket(sHost, 30001);
+            PrintWriter pwP2P = new PrintWriter(p2pSocket.getOutputStream(), true);
+            BufferedReader brP2P = new BufferedReader(new InputStreamReader(p2pSocket.getInputStream()));
+            long lStartTime = System.currentTimeMillis();
+            long lEndTime = 0;
+            pwP2P.write("ping");
+            String sPong;
+            while ((sPong = brP2P.readLine()) != null )
+                {
+                lEndTime = System.currentTimeMillis();
+                if (sPong.equals("pong"))
+                    break;
+                }
+            lRTT = lEndTime - lStartTime;
+            pwP2P.close();
+            brP2P.close();
+            p2pSocket.close();
             }
         catch (IOException e)
             {
-            System.err.println("IOException occured: " + e.toString());
-            System.exit(1);
+            System.err.println("Error occured while measuring RTT to: " + sHost);
+            System.err.println("Detalis: " + e.toString());
+            }
+        return lRTT;
+        }
+    
+    public void listenToPseudoPing()
+        {
+        try
+            {
+            pingListen = new ServerSocket(30001);
+            while (true)
+                {
+                Socket sCurrent = pingListen.accept();
+                PrintWriter pwPong = new PrintWriter(sCurrent.getOutputStream(), true);
+                BufferedReader brPing = new BufferedReader(new InputStreamReader(sCurrent.getInputStream()));
+                while (brPing.readLine() != null)
+                    pwPong.write("pong");
+                pwPong.close();
+                brPing.close();
+                sCurrent.close();
+                }
+            }
+        catch (IOException e)
+            {
+            System.err.println("Error occured while listening to pseudoping!");
+            System.err.println("Detalis: " + e.toString());
             }
         }
 
-    private void runClient() throws IOException
+    public void search(String sToSearch)
         {
-        stdIn = new BufferedReader(new InputStreamReader(System.in));
-	String userInput;
-        String sEcho;
-        
-	while (!(userInput = stdIn.readLine()).equals("logout"))
+        }
+    
+    public void updateShares()
+        {
+        }
+    
+    public void exit()
+        {
+        try
             {
-	    out.println(userInput);
-            sEcho = in.readLine();
-            if (!sEcho.equals("You are terminated!"))
-                System.out.println("Echo: " + sEcho + "\n");
-            else
-                {
-                System.out.println(sEcho + "\n");
-                out.close();
-                in.close();
-                stdIn.close();
-                echoSocket.close();
-                System.exit(2);
-                }
+            disconnectFromServer();
+            out.close();
+            in.close();
+            serverSocket.close();
+            pingListen.close();
             }
-        
-        out.println("logout");
-	out.close();
-	in.close();
-	stdIn.close();
-	echoSocket.close();
-        System.exit(2);
+        catch (IOException e) {}
+        System.exit(0);
         }
     
     public static void main(String args[]) {
