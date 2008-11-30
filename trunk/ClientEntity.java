@@ -43,7 +43,6 @@ class ClientEntity implements Runnable
                 
                 while(!(sLine = buffIn.readLine()).equals("logout"))
                     {
-                    pwOut.println(sLine);
                     }
                 
                 callerServer.disconnect();
