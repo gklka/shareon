@@ -11,9 +11,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.util.Hashtable;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
+import shareonclient.ShareOnClient.ParsedShareOn;
 
 /**
  *
@@ -22,14 +24,14 @@ import javax.swing.ListSelectionModel;
 
 public class ClientGUI extends javax.swing.JFrame implements ActionListener, WindowListener{
     
-    private ShareOnClient ownerClient;          //ShareOn Client who owns the GUI
-    private Vector<File> vSharedFiles;          //Vector to maintain the shared files
-    private Vector<String> vSharedFileNames;    //Vector to maintain the names of the shared files
+    private ShareOnClient ownerClient;              //ShareOn Client who owns the GUI
+    private Hashtable<String, File> hSharedFiles;   //Hashtable to maintain the shared files
+    private Vector<String> vSharedFileNames;        //Vector to maintain the names of the shared files
     
     /** Creates new form ClientGUI */
     public ClientGUI(ShareOnClient ownerClientIn) {
         ownerClient = ownerClientIn;
-        vSharedFiles = new Vector<File>();
+        hSharedFiles = new Hashtable<String, File>();
         vSharedFileNames = new Vector<String>();
         initComponents();
         jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -59,7 +61,20 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             }
         if (e.getSource() == jAddShareOnButton)
             {
-            ownerClient.chooseFile(true);
+            File fShareOn = ownerClient.chooseFile(true);
+            if (fShareOn != null)
+                {
+                ParsedShareOn psPeers = ownerClient.parseShareOn(fShareOn);
+                if (psPeers == null)
+                    JOptionPane.showMessageDialog(this, "Error: Invalid ShareOn syntax!", "Error!", JOptionPane.ERROR_MESSAGE);
+                else
+                    {
+                    //update result list
+                    jResultsList = new javax.swing.JList(psPeers.getDisplayableResults());
+                    jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                    jResultsScrollPane.setViewportView(jResultsList);
+                    }
+                }
             }
         if (e.getSource() == jAddShareButton)
             {
@@ -67,9 +82,9 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             if (fChosen != null)
                 {
                 //share maintenance
-                if (!vSharedFileNames.contains(fChosen))
+                if (!vSharedFileNames.contains(fChosen.getName()))
                     {
-                    vSharedFiles.add(fChosen);
+                    hSharedFiles.put(fChosen.getName(), fChosen);
                     vSharedFileNames.add(fChosen.getName());
                     }
                 else
@@ -86,7 +101,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             //share maintenance
             if (iIndex != -1)
                 {
-                vSharedFiles.remove(iIndex);
+                hSharedFiles.remove(vSharedFileNames.elementAt(iIndex));
                 vSharedFileNames.remove(iIndex);
                 }
             //update share list
@@ -136,8 +151,8 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         jResultsScrollPane = new javax.swing.JScrollPane();
         jResultsList = new javax.swing.JList();
         jPanel1 = new javax.swing.JPanel();
-        jDownloadButton = new javax.swing.JButton();
         jAddShareOnButton = new javax.swing.JButton();
+        jDownloadButton = new javax.swing.JButton();
         jSharePanel = new javax.swing.JPanel();
         jSharesScrollPane = new javax.swing.JScrollPane();
         jSharesList = new javax.swing.JList();
@@ -218,6 +233,14 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
+        jAddShareOnButton.setText(".shareon");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        jPanel1.add(jAddShareOnButton, gridBagConstraints);
+
         jDownloadButton.setText("Download");
         jDownloadButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -225,16 +248,10 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel1.add(jDownloadButton, gridBagConstraints);
-
-        jAddShareOnButton.setText(".shareon");
-        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        jPanel1.add(jAddShareOnButton, gridBagConstraints);
+        jPanel1.add(jDownloadButton, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;

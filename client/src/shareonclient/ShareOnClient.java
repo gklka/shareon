@@ -11,6 +11,11 @@ package shareonclient;
  */
 import java.io.*;
 import java.net.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -176,6 +181,95 @@ public class ShareOnClient {
             }
         catch (IOException e) {}
         System.exit(0);
+        }
+    
+    //function to parse a .shareon file
+    public ParsedShareOn parseShareOn(File fIn)
+        {
+        //variables needed to create a ParsedShareOn class
+        Vector<String> vRTTs = new Vector<String>();
+        Hashtable<String, String> hPeers =  new Hashtable<String, String>();
+        String sFileName;
+        
+        try
+            {
+            //create a file reader
+            BufferedReader fReader = new BufferedReader(new FileReader(fIn));
+            String sLine = fReader.readLine();
+            //the SHAREON header is a must have thing :)
+            if (!sLine.equals("SHAREON1"))
+                {
+                fReader.close();
+                return null;
+                }
+            //if no file name is specified we can't do anything
+            sFileName = fReader.readLine();
+            if (sFileName == null)
+                {
+                fReader.close();
+                return null;
+                }
+            //we collect the seeders and their RTTs
+            while(!(sLine = fReader.readLine()).equals("END"))
+                {
+                if (sLine == null)
+                    {
+                    fReader.close();
+                    return null;
+                    }
+                String sRTT = pseudoPing(sLine);
+                if ((!sRTT.equals("unreachable")) && (!sRTT.equals("doesn't exist")))
+                    {
+                    vRTTs.add(sRTT);
+                    hPeers.put(sRTT, sLine);
+                    }
+                }
+            fReader.close();
+            //and finally its showtime!
+            ParsedShareOn psCurrent = new ParsedShareOn(vRTTs, hPeers, sFileName);
+            return psCurrent;
+            }
+        catch (FileNotFoundException fe)
+            {
+            System.err.println("File not found!");
+            System.err.println("Details: " + fe.toString());
+            }
+        catch (IOException ie)
+            {
+            System.err.println("I/O error while parsing the .shareon file!");
+            System.err.println("Details: " + ie.toString());
+            }
+        return null;
+        }
+    
+    //class to represent a parsed shareon file
+    public class ParsedShareOn
+        {
+        private Vector<String> vRTTs;               //vector to store the rRTTs
+        private Hashtable<String, String> hPeers;   //hashtable to store the peers with their RTTs as keys
+        private String sFileName;                   //string to store the filename
+        //file names + RTTs sorted in ascending order of the RTTs
+        private Vector<String> vDisplayableResults = new Vector<String>();
+        
+        public ParsedShareOn(Vector<String> vRTTsIn, Hashtable<String, String> hPeersIn, String sFileNameIn)
+            {
+            vRTTs = vRTTsIn;
+            hPeers = hPeersIn;
+            sFileName = sFileNameIn;
+            //sort the RTT vector
+            Comparator cAscending = Collections.reverseOrder();
+            Collections.sort(vRTTs, cAscending);
+            Iterator vIter = vRTTs.iterator();
+            while (vIter.hasNext())
+                {
+                String sRTT = (String)vIter.next();
+                vDisplayableResults.add("RTT(ms): " + sRTT + " Peer: " + hPeers.get(sRTT));
+                }
+            }
+        public String getFilename() { return sFileName; }
+        public Vector<String> getRoundTripTimes() { return vRTTs; }
+        public Hashtable<String, String> getPeersHashedWithRTTs() { return hPeers; }
+        public Vector<String> getDisplayableResults() { return vDisplayableResults; }
         }
     
     public static void main(String args[]) {
