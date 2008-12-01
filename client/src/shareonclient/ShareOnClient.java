@@ -16,18 +16,18 @@ import javax.swing.JOptionPane;
 
 public class ShareOnClient {
     
-    private Socket serverSocket;
-    private PrintWriter out;
-    private BufferedReader in;
-    private ClientGUI currentGUI;
-    private boolean bRetry;
-    private boolean bConnected;
-    private PseudoPingListener currentListener;
-    private Thread tPseudoPingListener;
-    private int iPingListenPort = 30001;
+    private Socket serverSocket;                //socket to connect to the server
+    private PrintWriter out;                    //printwriter to communicate with the server
+    private BufferedReader in;                  //bufferedreader to communicate with the server
+    private ClientGUI currentGUI;               //GUI of the client              
+    private boolean bConnected;                 //server connection status
+    private PseudoPingListener currentListener; //listener class to listen to pseudopings
+    private Thread tPseudoPingListener;         //thread to run the listener
+    private int iPingListenPort = 30001;        //port to listen to pseudoping
         
     public ShareOnClient()
         {
+        //init some values
         serverSocket = null;
         out = null;
         currentGUI = new ClientGUI(this);
@@ -41,18 +41,21 @@ public class ShareOnClient {
     
     public void connectToServer()
         {
+        //if we are connected, we don't connect again
         if (bConnected)
             return;
         while (true)
             {
             try 
                 {
+                //creating socket and streams
                 serverSocket = new Socket("localhost", 30000);
                 out = new PrintWriter(serverSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
                 bConnected = true;
                 break;
-                } 
+                }
+            //if there are errors we show some error messages
             catch (UnknownHostException e)
                 {
                 currentGUI.setStatusText("connection falied");
@@ -82,9 +85,11 @@ public class ShareOnClient {
                     }
                 }
             }
+            //if we connected successfully we update the status text
             currentGUI.setStatusText("connected to server");
         }
     
+    //unction to disconnect from server
     public void disconnectFromServer()
         {
         if (!bConnected)
@@ -96,6 +101,7 @@ public class ShareOnClient {
     
     public boolean isConnectedToServer() { return bConnected; }
     
+    //file chooser function
     public File chooseFile(boolean bIsShareOn)
         {
         JFileChooser chooseFile = new JFileChooser();
@@ -105,6 +111,7 @@ public class ShareOnClient {
         return chooseFile.getSelectedFile();
         }
     
+    //pseudoping a host
     public String pseudoPing(String sHost)
         {
         PrintWriter pwPing;
@@ -113,6 +120,7 @@ public class ShareOnClient {
 
         try
             {
+            //create socket and streams
             pingSocket = new Socket(sHost, iPingListenPort);
             pwPing = new PrintWriter(pingSocket.getOutputStream(), true);
             brPing = new BufferedReader(new InputStreamReader(pingSocket.getInputStream()));
@@ -130,6 +138,8 @@ public class ShareOnClient {
 
         try
             {
+            //pseudo ping time is an RTT time:
+            //time elapsed between the outgoing and the incoming message
             long lEndTime = 0;
             long lStartTime = System.currentTimeMillis();
             pwPing.println("ping");
@@ -147,15 +157,13 @@ public class ShareOnClient {
             return ("unreachable");
             }
         }
-
+        
+    //search files on the server
     public void search(String sToSearch)
         {
         }
     
-    public void updateShares()
-        {
-        }
-    
+    //in case of exit, everything must be cleaned up
     public void exit()
         {
         try

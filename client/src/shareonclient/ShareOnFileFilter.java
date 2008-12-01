@@ -13,6 +13,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 // class to filter files
+// currently it only accepts .shareon files (and directorys of course)
 class ShareOnFileFilter extends FileFilter
     {
     private String extension;

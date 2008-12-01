@@ -17,16 +17,17 @@ import java.net.Socket;
  * @author Bandita
  */
 public class PseudoPingListener implements Runnable{
-    private int iPingListenPort = 30001;
-    private ServerSocket pingSocket;
-    private Socket clientSocket;
-    private PrintWriter pwPing;
-    private BufferedReader brPing;
+    private int iPingListenPort = 30001;    //port to listen to pseudoping
+    private ServerSocket pingSocket;        //socket to listen to pseudoping
+    private Socket clientSocket;            //socket to pong
+    private PrintWriter pwPing;             //printwriter to pong
+    private BufferedReader brPing;          //bufferedreader to hear the ping message
     
     public PseudoPingListener()
         {
         try
             {
+            //create the listen socket
             pingSocket = new ServerSocket(iPingListenPort);
             run();
             }
@@ -44,6 +45,11 @@ public class PseudoPingListener implements Runnable{
             {
             try
                 {
+                /* We accept an incoming ping request here.
+                 * This is not threaded, however the possibility 
+                 * of receiving another ping while one is currently being ponged,
+                 * is indeed close to zero. So it is acceptable :)
+                 */ 
                 clientSocket = pingSocket.accept();
                 pwPing = new PrintWriter(clientSocket.getOutputStream(), true);
                 brPing = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));

@@ -22,9 +22,9 @@ import javax.swing.ListSelectionModel;
 
 public class ClientGUI extends javax.swing.JFrame implements ActionListener, WindowListener{
     
-    private ShareOnClient ownerClient;
-    private Vector<File> vSharedFiles;
-    private Vector<String> vSharedFileNames;
+    private ShareOnClient ownerClient;          //ShareOn Client who owns the GUI
+    private Vector<File> vSharedFiles;          //Vector to maintain the shared files
+    private Vector<String> vSharedFileNames;    //Vector to maintain the names of the shared files
     
     /** Creates new form ClientGUI */
     public ClientGUI(ShareOnClient ownerClientIn) {
@@ -66,6 +66,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             File fChosen = ownerClient.chooseFile(false);
             if (fChosen != null)
                 {
+                //share maintenance
                 if (!vSharedFileNames.contains(fChosen))
                     {
                     vSharedFiles.add(fChosen);
@@ -73,6 +74,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                     }
                 else
                     JOptionPane.showMessageDialog(this, "Error: file already added!", "Error!", JOptionPane.ERROR_MESSAGE);
+                //update share list
                 jSharesList = new javax.swing.JList(vSharedFileNames);
                 jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 jSharesScrollPane.setViewportView(jSharesList);
@@ -81,11 +83,13 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         if (e.getSource() == jRemoveShareButton)
             {
             int iIndex = jSharesList.getSelectedIndex();
+            //share maintenance
             if (iIndex != -1)
                 {
                 vSharedFiles.remove(iIndex);
                 vSharedFileNames.remove(iIndex);
                 }
+            //update share list
             jSharesList = new javax.swing.JList(vSharedFileNames);
             jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jSharesScrollPane.setViewportView(jSharesList);
