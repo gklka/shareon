@@ -16,18 +16,18 @@ import java.sql.*;
 
 public class ShareOnServer {
     
-    private final int iMaxConnections = 100;
-    private int serverPort = 30000;
-    private int iConnections = 0;
-    private ServerSocket socketListen;
-    private Connection dbConnection;
+    private final int iMaxConnections = 100;    //number of max simultaneous connections
+    private int serverPort = 30000;             //listen port of the server
+    private int iConnections = 0;               //number of active connections
+    private ServerSocket socketListen;          //listen socket of the server
+    private Connection dbConnection;            //connection to the MySQL database
     
     public ShareOnServer() throws IOException
         {
         System.out.println("Loading MySQL JDBC driver...");
         try
             {
-            // Load Sun's jdbc-odbc driver
+            // load Sun's jdbc-odbc driver
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             }
         catch (Exception e) // driver not found
@@ -41,6 +41,7 @@ public class ShareOnServer {
         System.out.println("Connecting to MySQL server...");
         String sURL = "jdbc:mysql://turul.eet.bme.hu:3306/db_mk0804";
         
+        //connect to the database
         try
             {
             dbConnection = DriverManager.getConnection (sURL, "mk0804", "Lenuecxm");
@@ -54,9 +55,10 @@ public class ShareOnServer {
             }
         System.out.println("Connected!");
         
+        //check if the shares maintenance table exists
         try
             {
-            System.out.println("Checking if content-peer table exists...");
+            System.out.println("Checking if the shares table exists...");
             DatabaseMetaData dbM = dbConnection.getMetaData();
             ResultSet rs = dbM.getTables(null, null, "shares", null);
             if (!rs.next())
@@ -91,16 +93,18 @@ public class ShareOnServer {
         runServer();
         }
     
+    //run the server
     private void runServer()
         {
         try
             {
             Socket sServer;
-
+            //while there are free connections we accept them
             while(iConnections < iMaxConnections)
                 {
                 iConnections++;
                 sServer = socketListen.accept();
+                //and start threads to interact with them simultaneously
                 ClientEntity clientConnecting = new ClientEntity(sServer, this);
                 Thread tClient = new Thread(clientConnecting);
                 tClient.start();
@@ -113,9 +117,14 @@ public class ShareOnServer {
     
     }       // end constructor
     
+    //function to decrease number of activ connections in case somebody disconnects
     public void disconnect() { iConnections--; }
     
     @Override
+    /**
+     * If the server is shut down, we must clean up all the mess we made,
+     * because this is a well behaving server program :)
+     */
     protected void finalize()
         {
         try { dbConnection.close(); }
@@ -124,6 +133,7 @@ public class ShareOnServer {
         catch (Throwable t) {}
         }
     
+    //random function to test a prepared statement
     private void testUpload()
         {
         try
@@ -139,6 +149,7 @@ public class ShareOnServer {
         catch (SQLException e) {}
         }
     
+    //random function to test a prepared statement
     private void testQuery()
         {
         try

@@ -21,10 +21,9 @@ class ClientEntity implements Runnable
         {
         Socket sServer;                 //socket to communicate with the client
         String sFromClient;             //message received from the client
-        PrintWriter pwOut = null;       //PrintWriter to wrtite
-        BufferedReader buffIn = null;   //BufferedReader to read
-        ShareOnServer callerServer;
-        String sLine;
+        PrintWriter pwOut = null;       //printwriter to communicate with the client
+        BufferedReader buffIn = null;   //bufferedreader to communicate with the client
+        ShareOnServer callerServer;     //server who owns the thread
 
         //save the socket in the constructor
         ClientEntity(Socket sServerIn, ShareOnServer callerServerIn)
@@ -35,16 +34,20 @@ class ClientEntity implements Runnable
 
         public void run ()
             {
-            //we just send back what we have received
             try 
                 {
+                //create socket and streams
                 pwOut = new PrintWriter(sServer.getOutputStream(), true);
                 buffIn = new BufferedReader(new InputStreamReader(sServer.getInputStream()));
-                
+                String sLine;
+                /**
+                 * @TODO
+                 * server-client communication
+                 */
                 while(!(sLine = buffIn.readLine()).equals("logout"))
                     {
                     }
-                
+                //once the client logs out, we clean up the mess
                 callerServer.disconnect();
                 pwOut.close();
                 buffIn.close();
