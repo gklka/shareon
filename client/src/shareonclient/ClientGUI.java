@@ -10,6 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.util.Vector;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 
 /**
  *
@@ -19,16 +23,24 @@ import java.awt.event.WindowListener;
 public class ClientGUI extends javax.swing.JFrame implements ActionListener, WindowListener{
     
     ShareOnClient ownerClient;
+    Vector<File> vSharedFiles;
+    Vector<String> vSharedFileNames;
     
     /** Creates new form ClientGUI */
     public ClientGUI(ShareOnClient ownerClientIn) {
         ownerClient = ownerClientIn;
+        vSharedFiles = new Vector<File>();
+        vSharedFileNames = new Vector<String>();
         initComponents();
+        jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jSearchButton.setEnabled(false);
         this.setLocation(100, 100);
         jLoginButton.addActionListener(this);
         jLogoutButton.addActionListener(this);
+        jAddShareOnButton.addActionListener(this);
         jAddShareButton.addActionListener(this);
+        jRemoveShareButton.addActionListener(this);
     }
     
     //ActionListener
@@ -45,9 +57,38 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             ownerClient.disconnectFromServer();
             jSearchButton.setEnabled(false);
             }
+        if (e.getSource() == jAddShareOnButton)
+            {
+            ownerClient.chooseFile(true);
+            }
         if (e.getSource() == jAddShareButton)
             {
-            ownerClient.chooseFile();
+            File fChosen = ownerClient.chooseFile(false);
+            if (fChosen != null)
+                {
+                if (!vSharedFiles.contains(fChosen))
+                    {
+                    vSharedFiles.add(fChosen);
+                    vSharedFileNames.add(fChosen.getName());
+                    }
+                else
+                    JOptionPane.showMessageDialog(this, "Error: file already added!", "Error!", JOptionPane.ERROR_MESSAGE);
+                jSharesList = new javax.swing.JList(vSharedFileNames);
+                jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                jSharesScrollPane.setViewportView(jSharesList);
+                }
+            }
+        if (e.getSource() == jRemoveShareButton)
+            {
+            int iIndex = jSharesList.getSelectedIndex();
+            if (iIndex != -1)
+                {
+                vSharedFiles.remove(iIndex);
+                vSharedFileNames.remove(iIndex);
+                }
+            jSharesList = new javax.swing.JList(vSharedFileNames);
+            jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jSharesScrollPane.setViewportView(jSharesList);
             }
         }
     
@@ -89,14 +130,16 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         jSearchField = new javax.swing.JTextField();
         jResultsPanel = new javax.swing.JPanel();
         jResultsScrollPane = new javax.swing.JScrollPane();
-        jResultList = new javax.swing.JList();
+        jResultsList = new javax.swing.JList();
+        jPanel1 = new javax.swing.JPanel();
         jDownloadButton = new javax.swing.JButton();
+        jAddShareOnButton = new javax.swing.JButton();
         jSharePanel = new javax.swing.JPanel();
         jSharesScrollPane = new javax.swing.JScrollPane();
-        jShareList = new javax.swing.JList();
+        jSharesList = new javax.swing.JList();
         jShareControlPanel = new javax.swing.JPanel();
-        jAddShareButton = new javax.swing.JButton();
         jRemoveShareButton = new javax.swing.JButton();
+        jAddShareButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBounds(new java.awt.Rectangle(0, 0, 800, 600));
@@ -160,7 +203,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         jResultsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Search results"));
         jResultsPanel.setLayout(new java.awt.GridBagLayout());
 
-        jResultsScrollPane.setViewportView(jResultList);
+        jResultsScrollPane.setViewportView(jResultsList);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -169,10 +212,29 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         gridBagConstraints.weighty = 1.0;
         jResultsPanel.add(jResultsScrollPane, gridBagConstraints);
 
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
         jDownloadButton.setText("Download");
+        jDownloadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jDownloadButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel1.add(jDownloadButton, gridBagConstraints);
+
+        jAddShareOnButton.setText(".shareon");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        jPanel1.add(jAddShareOnButton, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        jResultsPanel.add(jDownloadButton, gridBagConstraints);
+        jResultsPanel.add(jPanel1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -187,7 +249,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         jSharePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("My shares"));
         jSharePanel.setLayout(new java.awt.GridBagLayout());
 
-        jSharesScrollPane.setViewportView(jShareList);
+        jSharesScrollPane.setViewportView(jSharesList);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -198,12 +260,6 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
 
         jShareControlPanel.setLayout(new java.awt.GridBagLayout());
 
-        jAddShareButton.setText("Add...");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        jShareControlPanel.add(jAddShareButton, gridBagConstraints);
-
         jRemoveShareButton.setText("Remove");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -211,6 +267,12 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         jShareControlPanel.add(jRemoveShareButton, gridBagConstraints);
+
+        jAddShareButton.setText("Add...");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jShareControlPanel.add(jAddShareButton, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -229,6 +291,10 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+private void jDownloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDownloadButtonActionPerformed
+// TODO add your handling code here:
+}//GEN-LAST:event_jDownloadButtonActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -244,19 +310,21 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jAddShareButton;
+    private javax.swing.JButton jAddShareOnButton;
     private javax.swing.JButton jDownloadButton;
     private javax.swing.JPanel jHeadPanel;
     private javax.swing.JButton jLoginButton;
     private javax.swing.JButton jLogoutButton;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton jRemoveShareButton;
-    private javax.swing.JList jResultList;
+    private javax.swing.JList jResultsList;
     private javax.swing.JPanel jResultsPanel;
     private javax.swing.JScrollPane jResultsScrollPane;
     private javax.swing.JButton jSearchButton;
     private javax.swing.JTextField jSearchField;
     private javax.swing.JPanel jShareControlPanel;
-    private javax.swing.JList jShareList;
     private javax.swing.JPanel jSharePanel;
+    private javax.swing.JList jSharesList;
     private javax.swing.JScrollPane jSharesScrollPane;
     private javax.swing.JLabel jStatusLabel;
     // End of variables declaration//GEN-END:variables

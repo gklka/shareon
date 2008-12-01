@@ -58,7 +58,8 @@ public class ShareOnClient {
                 int answer = JOptionPane.showConfirmDialog(currentGUI,
                                                            "Don't know about host: localhost.\nPress YES to try again or NO otherwise!",
                                                            "Connection error!",
-                                                           JOptionPane.YES_NO_OPTION);
+                                                           JOptionPane.YES_NO_OPTION,
+                                                           JOptionPane.ERROR_MESSAGE);
                 if (answer == JOptionPane.NO_OPTION)
                     {
                     currentGUI.setStatusText("offline mode");
@@ -71,7 +72,8 @@ public class ShareOnClient {
                 int answer = JOptionPane.showConfirmDialog(currentGUI,
                                                            "Couldn't get I/O for the connection to: localhost.\nPress YES to try again or NO otherwise!",
                                                            "Connection error!",
-                                                           JOptionPane.YES_NO_OPTION);
+                                                           JOptionPane.YES_NO_OPTION,
+                                                           JOptionPane.ERROR_MESSAGE);
                 if (answer == JOptionPane.NO_OPTION)
                     {
                     currentGUI.setStatusText("offline mode");
@@ -93,10 +95,11 @@ public class ShareOnClient {
     
     public boolean isConnectedToServer() { return bConnected; }
     
-    public File chooseFile()
+    public File chooseFile(boolean bIsShareOn)
         {
         JFileChooser chooseFile = new JFileChooser();
-        chooseFile.setFileFilter(new ShareOnFileFilter());
+        if (bIsShareOn)
+            chooseFile.setFileFilter(new ShareOnFileFilter());
         chooseFile.showOpenDialog(currentGUI);
         return chooseFile.getSelectedFile();
         } 
