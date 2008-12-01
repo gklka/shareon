@@ -22,9 +22,9 @@ import javax.swing.ListSelectionModel;
 
 public class ClientGUI extends javax.swing.JFrame implements ActionListener, WindowListener{
     
-    ShareOnClient ownerClient;
-    Vector<File> vSharedFiles;
-    Vector<String> vSharedFileNames;
+    private ShareOnClient ownerClient;
+    private Vector<File> vSharedFiles;
+    private Vector<String> vSharedFileNames;
     
     /** Creates new form ClientGUI */
     public ClientGUI(ShareOnClient ownerClientIn) {
@@ -66,7 +66,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             File fChosen = ownerClient.chooseFile(false);
             if (fChosen != null)
                 {
-                if (!vSharedFiles.contains(fChosen))
+                if (!vSharedFileNames.contains(fChosen))
                     {
                     vSharedFiles.add(fChosen);
                     vSharedFileNames.add(fChosen.getName());

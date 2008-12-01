@@ -15,8 +15,8 @@ import javax.swing.filechooser.FileFilter;
 // class to filter files
 class ShareOnFileFilter extends FileFilter
     {
-    String extension;
-    String description;
+    private String extension;
+    private String description;
     
     public ShareOnFileFilter()
         {

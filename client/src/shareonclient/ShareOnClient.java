@@ -16,13 +16,15 @@ import javax.swing.JOptionPane;
 
 public class ShareOnClient {
     
-    Socket serverSocket;
-    ServerSocket pingListen;
-    PrintWriter out;
-    BufferedReader in;
-    ClientGUI currentGUI;
-    boolean bRetry;
-    boolean bConnected;
+    private Socket serverSocket;
+    private PrintWriter out;
+    private BufferedReader in;
+    private ClientGUI currentGUI;
+    private boolean bRetry;
+    private boolean bConnected;
+    private PseudoPingListener currentListener;
+    private Thread tPseudoPingListener;
+    private int iPingListenPort = 30001;
         
     public ShareOnClient()
         {
@@ -32,10 +34,9 @@ public class ShareOnClient {
         currentGUI.setVisible(true);
         bConnected = false;
         currentGUI.setStatusText("offline mode");
-        
-        // listen to pseudopings from peers
-        //listenToPseudoPing();
-        //long lTmp = pseudoPing("localhost");
+        currentListener = new PseudoPingListener();
+        tPseudoPingListener = new Thread(currentListener);
+        tPseudoPingListener.start();
         }
     
     public void connectToServer()
@@ -102,60 +103,48 @@ public class ShareOnClient {
             chooseFile.setFileFilter(new ShareOnFileFilter());
         chooseFile.showOpenDialog(currentGUI);
         return chooseFile.getSelectedFile();
-        } 
-    
-    public long pseudoPing(String sHost)
-        {
-        long lRTT =  0;
-        try
-            {
-            Socket p2pSocket = new Socket(sHost, 30001);
-            PrintWriter pwP2P = new PrintWriter(p2pSocket.getOutputStream(), true);
-            BufferedReader brP2P = new BufferedReader(new InputStreamReader(p2pSocket.getInputStream()));
-            long lStartTime = System.currentTimeMillis();
-            long lEndTime = 0;
-            pwP2P.write("ping");
-            String sPong;
-            while ((sPong = brP2P.readLine()) != null )
-                {
-                lEndTime = System.currentTimeMillis();
-                if (sPong.equals("pong"))
-                    break;
-                }
-            lRTT = lEndTime - lStartTime;
-            pwP2P.close();
-            brP2P.close();
-            p2pSocket.close();
-            }
-        catch (IOException e)
-            {
-            System.err.println("Error occured while measuring RTT to: " + sHost);
-            System.err.println("Detalis: " + e.toString());
-            }
-        return lRTT;
         }
     
-    public void listenToPseudoPing()
+    public String pseudoPing(String sHost)
         {
+        PrintWriter pwPing;
+        BufferedReader brPing;
+        Socket pingSocket;
+
         try
             {
-            pingListen = new ServerSocket(30001);
-            while (true)
-                {
-                Socket sCurrent = pingListen.accept();
-                PrintWriter pwPong = new PrintWriter(sCurrent.getOutputStream(), true);
-                BufferedReader brPing = new BufferedReader(new InputStreamReader(sCurrent.getInputStream()));
-                while (brPing.readLine() != null)
-                    pwPong.write("pong");
-                pwPong.close();
-                brPing.close();
-                sCurrent.close();
-                }
+            pingSocket = new Socket(sHost, iPingListenPort);
+            pwPing = new PrintWriter(pingSocket.getOutputStream(), true);
+            brPing = new BufferedReader(new InputStreamReader(pingSocket.getInputStream()));
+            }
+        catch (UnknownHostException e)
+            {
+            System.err.println("Don't know about host: " + sHost);
+            return ("doesn't exist");
             }
         catch (IOException e)
             {
-            System.err.println("Error occured while listening to pseudoping!");
-            System.err.println("Detalis: " + e.toString());
+            System.err.println("Host unreachable: " + sHost);
+            return ("unreachable");
+            }
+
+        try
+            {
+            long lEndTime = 0;
+            long lStartTime = System.currentTimeMillis();
+            pwPing.println("ping");
+            String sPong = brPing.readLine();
+            if (sPong.equals("pong"))
+                lEndTime = System.currentTimeMillis();
+            pwPing.close();
+            brPing.close();
+            pingSocket.close();
+            return String.valueOf(lEndTime - lStartTime);
+            }
+        catch (IOException e)
+            {
+            System.err.println("Couldn't ping host: " + sHost);
+            return ("unreachable");
             }
         }
 
@@ -171,11 +160,11 @@ public class ShareOnClient {
         {
         try
             {
+            tPseudoPingListener.interrupt();
             disconnectFromServer();
             out.close();
             in.close();
             serverSocket.close();
-            pingListen.close();
             }
         catch (IOException e) {}
         System.exit(0);
