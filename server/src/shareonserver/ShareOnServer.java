@@ -45,7 +45,7 @@ public class ShareOnServer {
         try
             {
             dbConnection = DriverManager.getConnection (sURL, "mk0804", "Lenuecxm");
-            dbConnection.setAutoCommit(false);
+            //dbConnection.setAutoCommit(false);
             }
         catch (SQLException e) // driver not found
             {

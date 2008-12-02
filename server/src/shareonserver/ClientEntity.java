@@ -24,6 +24,7 @@ class ClientEntity implements Runnable
         PrintWriter pwOut = null;       //printwriter to communicate with the client
         BufferedReader buffIn = null;   //bufferedreader to communicate with the client
         ShareOnServer callerServer;     //server who owns the thread
+        String sClientIP;               //IP of the connected client
 
         //save the socket in the constructor
         ClientEntity(Socket sServerIn, ShareOnServer callerServerIn)
@@ -39,13 +40,27 @@ class ClientEntity implements Runnable
                 //create socket and streams
                 pwOut = new PrintWriter(sServer.getOutputStream(), true);
                 buffIn = new BufferedReader(new InputStreamReader(sServer.getInputStream()));
+                sClientIP = (sServer.getInetAddress()).toString().substring(1);
                 String sLine;
-                /**
-                 * @TODO
-                 * server-client communication
-                 */
                 while(!(sLine = buffIn.readLine()).equals("logout"))
                     {
+                    
+                    //shared file added
+                    if (sLine.startsWith("added@"))
+                        {
+                        pwOut.println("ACK");
+                        }
+                    
+                    //shared file removed
+                    if (sLine.startsWith("removed@"))
+                        {
+                        pwOut.println("ACK");
+                        }
+                    
+                    //remote IP address request
+                    if (sLine.equals("IP"))
+                        pwOut.println(sClientIP);
+                        //pwOut.println(sServer.getRemoteSocketAddress());
                     }
                 //once the client logs out, we clean up the mess
                 callerServer.disconnect();
