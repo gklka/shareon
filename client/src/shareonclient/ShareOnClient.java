@@ -29,6 +29,7 @@ public class ShareOnClient {
     private PseudoPingListener currentListener; //listener class to listen to pseudopings
     private Thread tPseudoPingListener;         //thread to run the listener
     private int iPingListenPort = 30001;        //port to listen to pseudoping
+    private String sLocalIP;                    //string representing the local IP address
         
     public ShareOnClient()
         {
@@ -58,6 +59,9 @@ public class ShareOnClient {
                 out = new PrintWriter(serverSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
                 bConnected = true;
+                //obtain the ip address of the client
+                out.println("IP");
+                sLocalIP = in.readLine();
                 break;
                 }
             //if there are errors we show some error messages
@@ -133,24 +137,26 @@ public class ShareOnClient {
         catch (UnknownHostException e)
             {
             System.err.println("Don't know about host: " + sHost);
-            return ("doesn't exist");
+            return null;
             }
         catch (IOException e)
             {
             System.err.println("Host unreachable: " + sHost);
-            return ("unreachable");
+            return null;
             }
 
         try
             {
             //pseudo ping time is an RTT time:
             //time elapsed between the outgoing and the incoming message
-            long lEndTime = 0;
+            long lEndTime = -1;
             long lStartTime = System.currentTimeMillis();
             pwPing.println("ping");
             String sPong = brPing.readLine();
             if (sPong.equals("pong"))
                 lEndTime = System.currentTimeMillis();
+            if (lEndTime == -1)
+                return null;
             pwPing.close();
             brPing.close();
             pingSocket.close();
@@ -159,7 +165,7 @@ public class ShareOnClient {
         catch (IOException e)
             {
             System.err.println("Couldn't ping host: " + sHost);
-            return ("unreachable");
+            return null;
             }
         }
         
@@ -168,19 +174,36 @@ public class ShareOnClient {
         {
         }
     
-    //in case of exit, everything must be cleaned up
-    public void exit()
+    /**function to return local IP
+     * Features that are unsupported at the moment:
+     * - use of NATs
+     * @TODO: handling NATs, handling everything, saving the world!
+     */
+    public String getLocalIP()
+        {
+        return sLocalIP;
+        }
+    
+    //send shared file updates to the server
+    public boolean updateShares(String sUpdate)
         {
         try
             {
-            tPseudoPingListener.interrupt();
-            disconnectFromServer();
-            out.close();
-            in.close();
-            serverSocket.close();
+            //we send the update string
+            out.println(sUpdate);
+            //and wait for answer
+            String sReply = in.readLine();
+            if (sReply.equals("ACK"))
+                return true;
+            else
+                return false;
             }
-        catch (IOException e) {}
-        System.exit(0);
+        catch (IOException e)
+            {
+            System.err.println("Error updating shares!");
+            System.err.println("Details: " + e.toString());
+            return false;
+            }
         }
     
     //function to parse a .shareon file
@@ -218,7 +241,7 @@ public class ShareOnClient {
                     return null;
                     }
                 String sRTT = pseudoPing(sLine);
-                if ((!sRTT.equals("unreachable")) && (!sRTT.equals("doesn't exist")))
+                if (sRTT != null)
                     {
                     vRTTs.add(sRTT);
                     hPeers.put(sRTT, sLine);
@@ -257,8 +280,9 @@ public class ShareOnClient {
             hPeers = hPeersIn;
             sFileName = sFileNameIn;
             //sort the RTT vector
-            Comparator cAscending = Collections.reverseOrder();
-            Collections.sort(vRTTs, cAscending);
+            Comparator cDescending = Collections.reverseOrder();
+            Collections.sort(vRTTs, cDescending);
+            Collections.reverse(vRTTs);
             Iterator vIter = vRTTs.iterator();
             while (vIter.hasNext())
                 {
@@ -270,6 +294,21 @@ public class ShareOnClient {
         public Vector<String> getRoundTripTimes() { return vRTTs; }
         public Hashtable<String, String> getPeersHashedWithRTTs() { return hPeers; }
         public Vector<String> getDisplayableResults() { return vDisplayableResults; }
+        }
+    
+    //in case of exit, everything must be cleaned up
+    public void exit()
+        {
+        try
+            {
+            tPseudoPingListener.interrupt();
+            disconnectFromServer();
+            out.close();
+            in.close();
+            serverSocket.close();
+            }
+        catch (IOException e) {}
+        System.exit(0);
         }
     
     public static void main(String args[]) {

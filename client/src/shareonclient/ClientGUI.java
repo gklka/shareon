@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.net.SocketException;
 import java.util.Hashtable;
 import java.util.Vector;
 import javax.swing.JOptionPane;
@@ -36,29 +37,45 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         initComponents();
         jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jSearchButton.setEnabled(false);
+        //jSearchButton.setEnabled(false);
         this.setLocation(100, 100);
         jLoginButton.addActionListener(this);
         jLogoutButton.addActionListener(this);
         jAddShareOnButton.addActionListener(this);
         jAddShareButton.addActionListener(this);
         jRemoveShareButton.addActionListener(this);
+        jSearchButton.addActionListener(this);
     }
     
     //ActionListener
     public void actionPerformed(ActionEvent e)
         {
+        
+        //login
         if (e.getSource() == jLoginButton)
             {
             ownerClient.connectToServer();
-            if (ownerClient.isConnectedToServer())
-                jSearchButton.setEnabled(true);
             }
+        
+        //logout
         if (e.getSource() == jLogoutButton)
             {
             ownerClient.disconnectFromServer();
             jSearchButton.setEnabled(false);
             }
+        
+        //search
+        if (e.getSource() == jSearchButton)
+            {
+            if (ownerClient.isConnectedToServer())
+                {
+                ownerClient.search(null);
+                }
+            else
+                JOptionPane.showMessageDialog(this, "Please login first!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            }
+        
+        //load .shareon
         if (e.getSource() == jAddShareOnButton)
             {
             File fShareOn = ownerClient.chooseFile(true);
@@ -66,7 +83,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                 {
                 ParsedShareOn psPeers = ownerClient.parseShareOn(fShareOn);
                 if (psPeers == null)
-                    JOptionPane.showMessageDialog(this, "Error: Invalid ShareOn syntax!", "Error!", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Invalid ShareOn syntax!", "Error!", JOptionPane.ERROR_MESSAGE);
                 else
                     {
                     //update result list
@@ -76,38 +93,69 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                     }
                 }
             }
+        
+        //add shared file
         if (e.getSource() == jAddShareButton)
             {
-            File fChosen = ownerClient.chooseFile(false);
-            if (fChosen != null)
+            boolean bMustUpdate = false;
+            if (ownerClient.isConnectedToServer())
                 {
-                //share maintenance
-                if (!vSharedFileNames.contains(fChosen.getName()))
+                File fChosen = ownerClient.chooseFile(false);
+                if (fChosen != null)
                     {
-                    hSharedFiles.put(fChosen.getName(), fChosen);
-                    vSharedFileNames.add(fChosen.getName());
+                    //share maintenance
+                    if (!vSharedFileNames.contains(fChosen.getName()))
+                        {  
+                        boolean bAcknowledged = ownerClient.updateShares("added@" + fChosen.getName() + "@" + ownerClient.getLocalIP());
+                        if (!bAcknowledged)
+                            JOptionPane.showMessageDialog(this, "Unable to send update to the server!", "Error!", JOptionPane.ERROR_MESSAGE);
+                        else
+                            {
+                            hSharedFiles.put(fChosen.getName(), fChosen);
+                            vSharedFileNames.add(fChosen.getName());
+                            bMustUpdate = true;
+                            }
+                        }
+                    else
+                        JOptionPane.showMessageDialog(this, "File already added!", "Error!", JOptionPane.ERROR_MESSAGE);
+                    if (bMustUpdate)
+                        {
+                        //update share list
+                        jSharesList = new javax.swing.JList(vSharedFileNames);
+                        jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                        jSharesScrollPane.setViewportView(jSharesList);
+                        }
                     }
+                }
+            else
+                JOptionPane.showMessageDialog(this, "Please login first!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            }
+        
+        //remove shared file
+        if (e.getSource() == jRemoveShareButton)
+            {
+            boolean bMustUpdate = false;
+            int iIndex = jSharesList.getSelectedIndex();
+            //share maintenance
+            if (iIndex != -1)
+                {
+                boolean bAcknowledged = ownerClient.updateShares("removed@" + hSharedFiles.get(vSharedFileNames.elementAt(iIndex)) + "@" + ownerClient.getLocalIP());
+                if (!bAcknowledged)
+                    JOptionPane.showMessageDialog(this, "Unable to send update to teh server!", "Error!", JOptionPane.ERROR_MESSAGE);
                 else
-                    JOptionPane.showMessageDialog(this, "Error: file already added!", "Error!", JOptionPane.ERROR_MESSAGE);
+                    {
+                    hSharedFiles.remove(vSharedFileNames.elementAt(iIndex));
+                    vSharedFileNames.remove(iIndex);
+                    bMustUpdate = true;
+                    }
+                }
+            if (bMustUpdate)
+                {
                 //update share list
                 jSharesList = new javax.swing.JList(vSharedFileNames);
                 jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 jSharesScrollPane.setViewportView(jSharesList);
                 }
-            }
-        if (e.getSource() == jRemoveShareButton)
-            {
-            int iIndex = jSharesList.getSelectedIndex();
-            //share maintenance
-            if (iIndex != -1)
-                {
-                hSharedFiles.remove(vSharedFileNames.elementAt(iIndex));
-                vSharedFileNames.remove(iIndex);
-                }
-            //update share list
-            jSharesList = new javax.swing.JList(vSharedFileNames);
-            jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            jSharesScrollPane.setViewportView(jSharesList);
             }
         }
     
