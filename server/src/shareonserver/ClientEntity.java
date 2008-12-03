@@ -67,10 +67,18 @@ class ClientEntity implements Runnable
                             pwOut.println("NACK");
                         }
                     
-                    //remote IP address request
+                    //request to identify the outer IP address of the connected client
                     if (sLine.equals("IP"))
                         pwOut.println(sClientIP);
                         //pwOut.println(sServer.getRemoteSocketAddress());
+                    
+                    //search request
+                    if (sLine.startsWith("search@"))
+                        {
+                        String[] sSplit = sLine.split("@");
+                        String sResults = callerServer.searchFile(sSplit[1]);
+                        pwOut.println(sResults);
+                        }
                     }
                 //once the client logs out, we clean up the mess
                 callerServer.removeClientShares(sClientIP);

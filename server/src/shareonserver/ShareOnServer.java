@@ -188,6 +188,30 @@ public class ShareOnServer {
             }
         }
     
+    public String searchFile(String sFileName)
+        {
+        try
+            {
+            String sResults = "";
+            PreparedStatement pstmt = dbConnection.prepareStatement("SELECT * FROM shares WHERE file LIKE ?;");
+            pstmt.setString(1, "%" + sFileName + "%");
+            pstmt.execute();
+            ResultSet searchResults = pstmt.getResultSet();
+            while (searchResults.next())
+                {
+                sResults += searchResults.getString(4) + "@";
+                }
+            //return the results (cut down the last '@')
+            return sResults.substring(0, sResults.length() - 1);
+            }
+        catch (SQLException e)
+            {
+            System.err.println("Error occured while searching!");
+            System.err.println("Details: " + e.toString());
+            return null;
+            }
+        }
+    
     public static void main (String args[])
         {
         try
