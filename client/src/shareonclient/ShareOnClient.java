@@ -69,7 +69,7 @@ public class ShareOnClient {
                 {
                 currentGUI.setStatusText("connection falied");
                 int answer = JOptionPane.showConfirmDialog(currentGUI,
-                                                           "Don't know about host: localhost.\nPress YES to try again or NO otherwise!",
+                                                           "The servers host couldn't be found!.\nPress YES to try again or NO otherwise!",
                                                            "Connection error!",
                                                            JOptionPane.YES_NO_OPTION,
                                                            JOptionPane.ERROR_MESSAGE);
@@ -83,7 +83,7 @@ public class ShareOnClient {
                 {
                 currentGUI.setStatusText("connection falied");
                 int answer = JOptionPane.showConfirmDialog(currentGUI,
-                                                           "Couldn't get I/O for the connection to: localhost.\nPress YES to try again or NO otherwise!",
+                                                           "Couldn't get I/O for the connection to the server.\nPress YES to try again or NO otherwise!",
                                                            "Connection error!",
                                                            JOptionPane.YES_NO_OPTION,
                                                            JOptionPane.ERROR_MESSAGE);
@@ -188,13 +188,30 @@ public class ShareOnClient {
         }
         
     //search files on the server
-    public void search(String sToSearch)
+    public String search(String sToSearch)
         {
+        try
+            {
+            out.println("search@" + sToSearch);
+            String sReply = in.readLine();
+            if (sReply.equals(""))
+                return null;
+            else
+                return sReply;
+            }
+        catch (IOException e)
+            {
+            System.err.println("Error executing search!");
+            System.err.println("Details: " + e.toString());
+            JOptionPane.showMessageDialog(currentGUI, "Couldn't perform search!\nClient will now disconnect!", "Error!", JOptionPane.ERROR_MESSAGE);
+            flushConnection();
+            return null;
+            }
         }
     
     /**function to return local IP
      * Features that are unsupported at the moment:
-     * - use of NATs
+     * - use of NATs (more exactly the connection of multiple users behind the same NAT)
      * @TODO: handling NATs, handling everything, saving the world!
      */
     public String getLocalIP()

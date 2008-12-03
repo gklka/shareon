@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Vector;
 import javax.swing.JOptionPane;
@@ -25,14 +27,16 @@ import shareonclient.ShareOnClient.ParsedShareOn;
 public class ClientGUI extends javax.swing.JFrame implements ActionListener, WindowListener{
     
     private ShareOnClient ownerClient;              //ShareOn Client who owns the GUI
-    private Hashtable<String, File> hSharedFiles;   //Hashtable to maintain the shared files
-    private Vector<String> vSharedFileNames;        //Vector to maintain the names of the shared files
+    private Hashtable<String, File> hSharedFiles;   //hashtable to maintain the shared files
+    private Vector<String> vSharedFileNames;        //vector to maintain the names of the shared files
+    private Vector<String> vSearchResults;          //vector to maintain the search results
     
     /** Creates new form ClientGUI */
     public ClientGUI(ShareOnClient ownerClientIn) {
         ownerClient = ownerClientIn;
         hSharedFiles = new Hashtable<String, File>();
         vSharedFileNames = new Vector<String>();
+        vSearchResults = new Vector<String>();
         initComponents();
         jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -60,7 +64,6 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         if (e.getSource() == jLogoutButton)
             {
             ownerClient.disconnectFromServer();
-            jSearchButton.setEnabled(false);
             }
         
         //search
@@ -68,7 +71,31 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             {
             if (ownerClient.isConnectedToServer())
                 {
-                ownerClient.search(null);
+                String sResults = ownerClient.search(jSearchField.getText());
+                if (sResults != null)
+                    {
+                    String[] sPeers = sResults.split("@");
+                    for (int i = 0; i < sPeers.length; i++)
+                        {
+                        System.out.println(sPeers[i]);
+                        System.out.println(System.currentTimeMillis());
+                        String sRTT = ownerClient.pseudoPing(sPeers[i]);
+                        if (sRTT != null)
+                            vSearchResults.add("RTT(ms): " + sRTT + " Peer: " + sPeers[i]);
+                        }
+                    if (!vSearchResults.isEmpty())
+                        {
+                        //update result list
+                        Comparator cDescending = Collections.reverseOrder();
+                        Collections.sort(vSearchResults, cDescending);
+                        Collections.reverse(vSearchResults);
+                        jResultsList = new javax.swing.JList(vSearchResults);
+                        jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                        jResultsScrollPane.setViewportView(jResultsList);
+                        }
+                    }
+                else
+                    JOptionPane.showMessageDialog(this, "No results found!", "", JOptionPane.WARNING_MESSAGE);
                 }
             else
                 JOptionPane.showMessageDialog(this, "Please login first!", "Warning!", JOptionPane.WARNING_MESSAGE);
