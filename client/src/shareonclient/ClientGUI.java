@@ -71,17 +71,20 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             {
             if (ownerClient.isConnectedToServer())
                 {
+                vSearchResults.clear();
                 String sResults = ownerClient.search(jSearchField.getText());
                 if (sResults != null)
                     {
                     String[] sPeers = sResults.split("@");
                     for (int i = 0; i < sPeers.length; i++)
                         {
-                        System.out.println(sPeers[i]);
-                        System.out.println(System.currentTimeMillis());
-                        String sRTT = ownerClient.pseudoPing(sPeers[i]);
-                        if (sRTT != null)
-                            vSearchResults.add("RTT(ms): " + sRTT + " Peer: " + sPeers[i]);
+                        //System.out.println(sPeers[i]);
+                        if (!sPeers[i].equals(ownerClient.getLocalIP()))
+                            {
+                            String sRTT = ownerClient.pseudoPing(sPeers[i]);
+                            if (sRTT != null)
+                                vSearchResults.add("RTT(ms): " + sRTT + " Peer: " + sPeers[i]);
+                            }
                         }
                     if (!vSearchResults.isEmpty())
                         {
