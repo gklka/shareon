@@ -48,13 +48,23 @@ class ClientEntity implements Runnable
                     //shared file added
                     if (sLine.startsWith("added@"))
                         {
-                        pwOut.println("ACK");
+                        String[] sSplit = sLine.split("@");
+                        boolean bSuccess = callerServer.executeUpload(sClientIP, sSplit[1], "ABCD");
+                        if (bSuccess)
+                            pwOut.println("ACK");
+                        else
+                            pwOut.println("NACK");
                         }
                     
                     //shared file removed
                     if (sLine.startsWith("removed@"))
                         {
-                        pwOut.println("ACK");
+                        String[] sSplit = sLine.split("@");
+                        boolean bSuccess = callerServer.executeDelete(sSplit[1], sClientIP);
+                        if (bSuccess)
+                            pwOut.println("ACK");
+                        else
+                            pwOut.println("NACK");
                         }
                     
                     //remote IP address request
@@ -63,6 +73,7 @@ class ClientEntity implements Runnable
                         //pwOut.println(sServer.getRemoteSocketAddress());
                     }
                 //once the client logs out, we clean up the mess
+                callerServer.removeClientShares(sClientIP);
                 callerServer.disconnect();
                 pwOut.close();
                 buffIn.close();
@@ -71,12 +82,14 @@ class ClientEntity implements Runnable
             catch (IOException e)
                 {
                 System.err.println("Exception occured: " + e.toString());
+                callerServer.removeClientShares(sClientIP);
                 callerServer.disconnect();
                 }
             catch (NullPointerException e)
                 {
                 System.err.println("Exception occured: " + e.toString());
                 System.err.println("Connection may be lost to a client!");
+                callerServer.removeClientShares(sClientIP);
                 callerServer.disconnect();
                 }
             }

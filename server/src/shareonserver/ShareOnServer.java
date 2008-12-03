@@ -133,40 +133,59 @@ public class ShareOnServer {
         catch (Throwable t) {}
         }
     
-    //random function to test a prepared statement
-    private void testUpload()
+    //function to create database reference of a shared file
+    public boolean executeUpload(String sIP, String sFileName, String sHash)
         {
         try
             {
-            PreparedStatement pstmt = dbConnection.prepareStatement("INSERT INTO shares (id , ip, file, hash) VALUES (?, ?, ?, ?);");
-            pstmt.setString(1, "42");
-            pstmt.setString(2, "152.66.212.113");
-            pstmt.setString(3, "ingyenporno.mkv");
-            pstmt.setString(4, "ABBAEDDAACDC");
+            PreparedStatement pstmt = dbConnection.prepareStatement("INSERT INTO shares (ip, file, hash) VALUES (?, ?, ?);");
+            pstmt.setString(1, sIP);
+            pstmt.setString(2, sFileName);
+            pstmt.setString(3, sHash);
             pstmt.executeUpdate();
-            dbConnection.commit();
+            return true;
             }
-        catch (SQLException e) {}
+        catch (SQLException e)
+            {
+            System.err.println("Unable to execute INSERT!");
+            System.err.println("Details: " + e.toString());
+            return false;
+            }
         }
     
-    //random function to test a prepared statement
-    private void testQuery()
+    //function to delete database reference of a removed object
+    public boolean executeDelete(String sFileName, String sIP)
         {
         try
             {
-            PreparedStatement pstmt = dbConnection.prepareStatement("SELECT * FROM shares WHERE id = ?");
-            pstmt.setString(1, "42");
-            pstmt.execute();
-            ResultSet rs = pstmt.getResultSet();
-            while (rs.next())
-                {
-                String s1 = rs.getString(2);
-                String s2 = rs.getString(3);
-                String s3 = rs.getString(4);
-                System.out.println(s1 + "\t" + s2 + "\t" + s3);
-                }
+            PreparedStatement pstmt = dbConnection.prepareStatement("DELETE FROM shares WHERE file = ? AND ip = ?;");
+            pstmt.setString(1, sFileName);
+            pstmt.setString(2, sIP);
+            pstmt.executeUpdate();
+            return true;
             }
-        catch (SQLException e) {}
+        catch (SQLException e) 
+            {
+            System.err.println("Unable to execute DELETE!");
+            System.err.println("Details: " + e.toString());
+            return false;
+            }
+        }
+    
+    //function to delete database references of a logged out client
+    public void removeClientShares(String sIP)
+        {
+        try
+            {
+            PreparedStatement pstmt = dbConnection.prepareStatement("DELETE FROM shares WHERE ip = ?;");
+            pstmt.setString(1, sIP);
+            pstmt.executeUpdate();
+            }
+        catch (SQLException e)
+            {
+            System.err.println("Unable to remove shares of " + sIP + " on logout!");
+            System.err.println("Details: " + e.toString());
+            }
         }
     
     public static void main (String args[])
