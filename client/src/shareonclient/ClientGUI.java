@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.net.SocketException;
 import java.util.Hashtable;
 import java.util.Vector;
 import javax.swing.JOptionPane;
@@ -106,7 +105,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                     //share maintenance
                     if (!vSharedFileNames.contains(fChosen.getName()))
                         {  
-                        boolean bAcknowledged = ownerClient.updateShares("added@" + fChosen.getName() + "@" + ownerClient.getLocalIP());
+                        boolean bAcknowledged = ownerClient.updateShares("added@" + fChosen.getName());
                         if (!bAcknowledged)
                             JOptionPane.showMessageDialog(this, "Unable to send update to the server!", "Error!", JOptionPane.ERROR_MESSAGE);
                         else
@@ -139,9 +138,9 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             //share maintenance
             if (iIndex != -1)
                 {
-                boolean bAcknowledged = ownerClient.updateShares("removed@" + hSharedFiles.get(vSharedFileNames.elementAt(iIndex)) + "@" + ownerClient.getLocalIP());
+                boolean bAcknowledged = ownerClient.updateShares("removed@" + (hSharedFiles.get(vSharedFileNames.elementAt(iIndex))).getName());
                 if (!bAcknowledged)
-                    JOptionPane.showMessageDialog(this, "Unable to send update to teh server!", "Error!", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Unable to send update to the server!", "Error!", JOptionPane.ERROR_MESSAGE);
                 else
                     {
                     hSharedFiles.remove(vSharedFileNames.elementAt(iIndex));
