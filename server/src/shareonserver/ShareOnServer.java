@@ -188,6 +188,7 @@ public class ShareOnServer {
             }
         }
     
+    //functin to search for files
     public String searchFile(String sFileName)
         {
         try
@@ -202,7 +203,10 @@ public class ShareOnServer {
                 sResults += searchResults.getString(4) + "@";
                 }
             //return the results (cut down the last '@')
-            return sResults.substring(0, sResults.length() - 1);
+            if (sResults.equals(""))
+                return "";
+            else
+                return sResults.substring(0, sResults.length() - 1);
             }
         catch (SQLException e)
             {
