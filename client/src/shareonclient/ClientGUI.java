@@ -86,19 +86,22 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                                 vSearchResults.add("RTT(ms): " + sRTT + " Peer: " + sPeers[i]);
                             }
                         }
-                    if (!vSearchResults.isEmpty())
-                        {
-                        //update result list
-                        Comparator cDescending = Collections.reverseOrder();
-                        Collections.sort(vSearchResults, cDescending);
-                        Collections.reverse(vSearchResults);
-                        jResultsList = new javax.swing.JList(vSearchResults);
-                        jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                        jResultsScrollPane.setViewportView(jResultsList);
-                        }
+                    //update result list
+                    Comparator cDescending = Collections.reverseOrder();
+                    Collections.sort(vSearchResults, cDescending);
+                    Collections.reverse(vSearchResults);
+                    jResultsList = new javax.swing.JList(vSearchResults);
+                    jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                    jResultsScrollPane.setViewportView(jResultsList);
                     }
                 else
+                    {
                     JOptionPane.showMessageDialog(this, "No results found!", "", JOptionPane.WARNING_MESSAGE);
+                    //clear search results
+                    jResultsList = new javax.swing.JList(vSearchResults);
+                    jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                    jResultsScrollPane.setViewportView(jResultsList);
+                    }
                 }
             else
                 JOptionPane.showMessageDialog(this, "Please login first!", "Warning!", JOptionPane.WARNING_MESSAGE);
