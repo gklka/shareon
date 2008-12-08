@@ -221,17 +221,9 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jHeadPanel = new javax.swing.JPanel();
-        jStatusLabel = new javax.swing.JLabel();
-        jLoginButton = new javax.swing.JButton();
-        jLogoutButton = new javax.swing.JButton();
-        jSearchButton = new javax.swing.JButton();
-        jSearchField = new javax.swing.JTextField();
         jResultsPanel = new javax.swing.JPanel();
         jResultsScrollPane = new javax.swing.JScrollPane();
         jResultsList = new javax.swing.JList();
-        jPanel1 = new javax.swing.JPanel();
-        jAddShareOnButton = new javax.swing.JButton();
         jDownloadButton = new javax.swing.JButton();
         jSharePanel = new javax.swing.JPanel();
         jSharesScrollPane = new javax.swing.JScrollPane();
@@ -239,87 +231,34 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         jShareControlPanel = new javax.swing.JPanel();
         jRemoveShareButton = new javax.swing.JButton();
         jAddShareButton = new javax.swing.JButton();
+        jHeadPanel = new javax.swing.JPanel();
+        jServerPanel = new javax.swing.JPanel();
+        jStatusLabel = new javax.swing.JLabel();
+        jLoginButton = new javax.swing.JButton();
+        jLogoutButton = new javax.swing.JButton();
+        jSearchButton = new javax.swing.JButton();
+        jSearchField = new javax.swing.JTextField();
+        jClientPanel = new javax.swing.JPanel();
+        jAddShareOnButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBounds(new java.awt.Rectangle(0, 0, 800, 600));
         setMinimumSize(new java.awt.Dimension(600, 600));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        jHeadPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Controls"));
-        jHeadPanel.setLayout(new java.awt.GridBagLayout());
-
-        jStatusLabel.setText("Status:");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 5.0;
-        gridBagConstraints.weighty = 1.0;
-        jHeadPanel.add(jStatusLabel, gridBagConstraints);
-
-        jLoginButton.setText("Login");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        jHeadPanel.add(jLoginButton, gridBagConstraints);
-
-        jLogoutButton.setText("Logout");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        jHeadPanel.add(jLogoutButton, gridBagConstraints);
-
-        jSearchButton.setText("Search!");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.weightx = 1.0;
-        jHeadPanel.add(jSearchButton, gridBagConstraints);
-
-        jSearchField.setText("Type file to search here!");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 5.0;
-        jHeadPanel.add(jSearchField, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 2.0;
-        getContentPane().add(jHeadPanel, gridBagConstraints);
-
-        jResultsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Search results"));
+        jResultsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Peers"));
         jResultsPanel.setLayout(new java.awt.GridBagLayout());
 
         jResultsScrollPane.setViewportView(jResultsList);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         jResultsPanel.add(jResultsScrollPane, gridBagConstraints);
-
-        jPanel1.setLayout(new java.awt.GridBagLayout());
-
-        jAddShareOnButton.setText(".shareon");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        jPanel1.add(jAddShareOnButton, gridBagConstraints);
 
         jDownloadButton.setText("Download");
         jDownloadButton.addActionListener(new java.awt.event.ActionListener() {
@@ -328,18 +267,15 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jResultsPanel.add(jDownloadButton, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel1.add(jDownloadButton, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        jResultsPanel.add(jPanel1, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -381,13 +317,93 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(jSharePanel, gridBagConstraints);
+
+        jHeadPanel.setLayout(new java.awt.GridBagLayout());
+
+        jServerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Server Controls"));
+        jServerPanel.setLayout(new java.awt.GridBagLayout());
+
+        jStatusLabel.setText("Status:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 5.0;
+        gridBagConstraints.weighty = 1.0;
+        jServerPanel.add(jStatusLabel, gridBagConstraints);
+
+        jLoginButton.setText("Login");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        jServerPanel.add(jLoginButton, gridBagConstraints);
+
+        jLogoutButton.setText("Logout");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        jServerPanel.add(jLogoutButton, gridBagConstraints);
+
+        jSearchButton.setText("Search!");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.weightx = 1.0;
+        jServerPanel.add(jSearchButton, gridBagConstraints);
+
+        jSearchField.setText("Type file to search here!");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 5.0;
+        jServerPanel.add(jSearchField, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 3.0;
+        jHeadPanel.add(jServerPanel, gridBagConstraints);
+
+        jClientPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Open Shareon File"));
+        jClientPanel.setLayout(new java.awt.GridBagLayout());
+
+        jAddShareOnButton.setText("Browse...");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        jClientPanel.add(jAddShareOnButton, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jHeadPanel.add(jClientPanel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        getContentPane().add(jHeadPanel, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -412,17 +428,18 @@ private void jDownloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jAddShareButton;
     private javax.swing.JButton jAddShareOnButton;
+    private javax.swing.JPanel jClientPanel;
     private javax.swing.JButton jDownloadButton;
     private javax.swing.JPanel jHeadPanel;
     private javax.swing.JButton jLoginButton;
     private javax.swing.JButton jLogoutButton;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton jRemoveShareButton;
     private javax.swing.JList jResultsList;
     private javax.swing.JPanel jResultsPanel;
     private javax.swing.JScrollPane jResultsScrollPane;
     private javax.swing.JButton jSearchButton;
     private javax.swing.JTextField jSearchField;
+    private javax.swing.JPanel jServerPanel;
     private javax.swing.JPanel jShareControlPanel;
     private javax.swing.JPanel jSharePanel;
     private javax.swing.JList jSharesList;
