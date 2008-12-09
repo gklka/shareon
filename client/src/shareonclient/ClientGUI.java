@@ -52,7 +52,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
     
     //ActionListener
     public void actionPerformed(ActionEvent e)
-        {
+    {
         
         //login
         if (e.getSource() == jLoginButton)
@@ -75,15 +75,24 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                 String sResults = ownerClient.search(jSearchField.getText());
                 if (sResults != null)
                     {
-                    String[] sPeers = sResults.split("@");
-                    for (int i = 0; i < sPeers.length; i++)
+                    String[] sPeersAndFiles = sResults.split("@");
+                    Vector<String> sPeers = new Vector<String>();
+                    Vector<String> sFiles = new Vector<String>();
+                    for (int i = 0; i < sPeersAndFiles.length; i++)
+                    {
+                        String[] temp = sPeersAndFiles[i].split("-");
+                        sPeers.add(temp[0]);
+                        sFiles.add(temp[1]);
+                    }
+                    for (int i = 0; ((i < sPeers.size()) && (i < sFiles.size())); i++)
                         {
-                        //System.out.println(sPeers[i]);
-                        if (!sPeers[i].equals(ownerClient.getLocalIP()))
+                        
+                        //System.out.println(sPeers.get(i)+" "+sFiles.get(i));
+                        if (!sPeers.get(i).equals(ownerClient.getLocalIP()))
                             {
-                            String sRTT = ownerClient.pseudoPing(sPeers[i]);
+                            String sRTT = ownerClient.pseudoPing(sPeers.get(i));
                             if (sRTT != null)
-                                vSearchResults.add("RTT(ms): " + sRTT + " Peer: " + sPeers[i]);
+                                vSearchResults.add("RTT(ms): " + sRTT + " File: " + sFiles.get(i) + " Peer: " + sPeers.get(i));
                             }
                         }
                     //update result list
@@ -189,7 +198,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                 jSharesScrollPane.setViewportView(jSharesList);
                 }
             }
-        }
+   }
     
     //set text to the status label
     public void setStatusText(String sStatusToSet)
@@ -408,8 +417,25 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+
 private void jDownloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDownloadButtonActionPerformed
-// TODO add your handling code here:
+if (evt.getSource() == jDownloadButton)
+        {
+            if (jResultsList.getSelectedIndex() == -1)
+            {
+                JOptionPane.showMessageDialog(this, "No file selected!\nPlease select a file from the search results to start download!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            }
+            else 
+            {
+                JOptionPane.showMessageDialog(this, "Downloading file: " + jResultsList.getSelectedValue().toString() + "\nPlease wait...", "Downloading", JOptionPane.INFORMATION_MESSAGE);
+                String[] sFileAndPeer = jResultsList.getSelectedValue().toString().split(" File: ");
+                String[] sTemp = sFileAndPeer[1].split(" Peer: ");
+                String sPeer = sTemp[1];
+                String sFile = sTemp[0];
+                ownerClient.startDownload(sPeer, sFile);                
+                
+            }
+        }    
 }//GEN-LAST:event_jDownloadButtonActionPerformed
 
     /**

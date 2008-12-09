@@ -18,20 +18,25 @@ import java.util.Iterator;
 import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import java.util.regex.Pattern;
 
 public class ShareOnClient {
     
-    private Socket serverSocket;                //socket to connect to the server
-    private PrintWriter out;                    //printwriter to communicate with the server
-    private BufferedReader in;                  //bufferedreader to communicate with the server
-    private ClientGUI currentGUI;               //GUI of the client              
-    private boolean bConnected;                 //server connection status
-    private PseudoPingListener currentListener; //listener class to listen to pseudopings
-    private Thread tPseudoPingListener;         //thread to run the listener
-    private int iPingListenPort = 30001;        //port to listen to pseudoping
-    private String sLocalIP;                    //string representing the local IP address
+    private Socket serverSocket;                    //socket to connect to the server
+    private PrintWriter out;                        //printwriter to communicate with the server
+    private BufferedReader in;                      //bufferedreader to communicate with the server
+    private ClientGUI currentGUI;                   //GUI of the client              
+    private boolean bConnected;                     //server connection status
+    private PseudoPingListener currentListener;     //listener class to listen to pseudopings
+    private Thread tPseudoPingListener;             //thread to run the listener
+    private int iPingListenPort = 30001;            //port to listen to pseudoping
+    private String sLocalIP;                        //string representing the local IP address
+    private int iFileTransferPort = 30002;          //port for uploading file
+    private UploadListenerThread tUploadListener;   //listener for file uploads
+    private final int iBufferSize = 1048576;        //buffer size for file transfer
+    private String sServerIP;                       //IP address of server
         
-    public ShareOnClient()
+    public ShareOnClient(String sIP)
         {
         //init some values
         serverSocket = null;
@@ -43,6 +48,9 @@ public class ShareOnClient {
         currentListener = new PseudoPingListener();
         tPseudoPingListener = new Thread(currentListener);
         tPseudoPingListener.start();
+        tUploadListener = new UploadListenerThread();
+        tUploadListener.start();
+        sServerIP = sIP;
         }
     
     public void connectToServer()
@@ -55,7 +63,7 @@ public class ShareOnClient {
             try 
                 {
                 //creating socket and streams
-                serverSocket = new Socket("localhost", 30000);
+                serverSocket = new Socket("192.168.1.200", 30000);
                 out = new PrintWriter(serverSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
                 bConnected = true;
@@ -330,6 +338,7 @@ public class ShareOnClient {
         public Vector<String> getRoundTripTimes() { return vRTTs; }
         public Hashtable<String, String> getPeersHashedWithRTTs() { return hPeers; }
         public Vector<String> getDisplayableResults() { return vDisplayableResults; }
+        public String getBestPeer() { return hPeers.elements().nextElement(); }
         }
     
     //in case of exit, everything must be cleaned up
@@ -347,7 +356,145 @@ public class ShareOnClient {
         System.exit(0);
         }
     
+    //class for downloading
+    class DownThread extends Thread {
+
+        String sPeer;       //source peer ip address
+        String sFile;       //filename to download
+        
+        public DownThread(String _sPeer, String _sFile) {
+            sPeer = _sPeer;
+            sFile = _sFile;
+        }
+
+        //the actual downloading happens below
+        @Override
+        public void run() {
+            Socket sSocket = new Socket();
+            try {
+                sSocket.connect(new InetSocketAddress(sPeer, iFileTransferPort), 10000);
+                System.out.println("  (" + this.getId() + ") Downloading (" + sFile + ") from <" + sSocket.getInetAddress() + ">");
+                DataOutputStream dos = new DataOutputStream(sSocket.getOutputStream());
+                dos.writeUTF(sFile);
+                dos.flush();
+                BufferedInputStream bis = new BufferedInputStream(sSocket.getInputStream());
+
+                byte[] buffer = new byte[iBufferSize];
+                FileOutputStream fos = new FileOutputStream(sFile);
+                int bytesRead;
+                while ((bytesRead = bis.read(buffer)) != -1) {
+                    fos.write(buffer, 0, bytesRead);
+                }
+                fos.flush();
+                fos.close();
+                dos.close();
+                System.out.println(" (" + this.getId() + ") completed");
+                sSocket.close();
+            } catch (UnknownHostException ex) {
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } finally {
+                try {
+                    sSocket.close();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                }
+            }
+        }
+    }
+    
+    //class for the uploadlistener
+    class UploadListenerThread extends Thread
+    {
+            //class to manage file uploads
+            class UploadThread extends Thread {
+
+                Socket sSocket;
+
+                public UploadThread(Socket s) {
+                    sSocket = s;
+                }
+
+                //the code to handle the upload
+                @Override
+                public void run() {
+                    try {
+                        DataInputStream dis = new DataInputStream(sSocket.getInputStream());
+                        String filename = dis.readUTF();
+                        System.out.println("  (" + this.getId() + ") Uploading (" + filename + ") to <" + sSocket.getInetAddress() + ">");
+                        BufferedInputStream bis = new BufferedInputStream(new FileInputStream("." + filename));
+                        BufferedOutputStream bos = new BufferedOutputStream(sSocket.getOutputStream());
+
+                        byte[] buffer = new byte[iBufferSize];
+                        int bytesRead;
+                        while ((bytesRead = bis.read(buffer)) != -1) {
+                            bos.write(buffer, 0, bytesRead);
+                        }
+
+                        bos.flush();
+                        dis.close();
+                        bis.close();
+                        bos.close();
+                        System.out.println("  (" + this.getId() + ") completed");
+                        sSocket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            sSocket.close();
+                        } catch (IOException e2) {
+                            e2.printStackTrace();
+                        }
+                    }
+                }
+            }
+            //server socket for managing downloads
+            ServerSocket uploadsocket = null;
+
+            @Override
+            public void run() {
+                //infinte loop, waiting for connections
+                while (true) {
+                    try {
+                        uploadsocket = new ServerSocket(iFileTransferPort);
+                        Socket client = uploadsocket.accept();
+                        UploadThread upload_thread = new UploadThread(client);
+                        upload_thread.start();
+                        uploadsocket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            uploadsocket.close();
+                        } catch (IOException e2) {
+                            e2.printStackTrace();
+                        }
+                    }
+            }
+        }
+    }
+    
+    //start a new thread for download
+    public void startDownload(String sSourceIP, String sFileName)
+    {
+        DownThread download_thread = new DownThread(sSourceIP, sFileName);
+        download_thread.start();
+    }
+    
+    //validate optional IP address
+    private static boolean validIPAddress(String sIPAddress)
+    {
+        final Pattern IP_PATTERN = Pattern.compile("b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).)"+"{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)b");
+        return IP_PATTERN.matcher(sIPAddress).matches();
+    }
+    
     public static void main(String args[]) {
-        ShareOnClient clientInstance = new ShareOnClient();
+        if (args.length > 0) {
+            String sServerAddr = args[0].toString();
+            if (validIPAddress(sServerAddr)) {ShareOnClient clientInstance = new ShareOnClient(sServerAddr);}
+        } else {ShareOnClient clientInstance = new ShareOnClient("localhost");}
+
+        
     }
 }
