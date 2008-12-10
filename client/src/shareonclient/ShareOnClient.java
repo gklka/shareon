@@ -398,9 +398,9 @@ public class ShareOnClient {
                     pmProgress += bytesRead;
                     pm.setProgress(pmProgress);
                 }
-                dis.close();
                 fos.flush();
                 fos.close();
+                dis.close();
                 dos.close();
                 System.out.println(" (" + this.getId() + ") Download completed");
                 sSocket.close();
@@ -438,12 +438,14 @@ public class ShareOnClient {
                     try {
                         DataInputStream dis = new DataInputStream(sSocket.getInputStream());
                         String filename = dis.readUTF();
-                        File fUpFile = new File("./_share/"+filename);
+                        Hashtable<String, File> sharedFiles = currentGUI.getSharedFiles();
+                        File fUpFile = sharedFiles.get(filename);
+                        System.out.println("File is:"+fUpFile.getAbsolutePath());
                         DataOutputStream dos = new DataOutputStream(sSocket.getOutputStream());
                         dos.writeInt((int)fUpFile.length());
                         dos.flush();
                         System.out.println("  (" + this.getId() + ") Uploading (" + filename + ") to <" + sSocket.getInetAddress() + ">");
-                        BufferedInputStream bis = new BufferedInputStream(new FileInputStream("./_share/"+filename));
+                        BufferedInputStream bis = new BufferedInputStream(new FileInputStream( fUpFile.getAbsolutePath() ));
                         BufferedOutputStream bos = new BufferedOutputStream(sSocket.getOutputStream());
 
                         byte[] buffer = new byte[iBufferSize];
@@ -511,7 +513,7 @@ public class ShareOnClient {
             validIPAddress(sServerAddr);
             //if (validIPAddress(sServerAddr)) {ShareOnClient clientInstance = new ShareOnClient(sServerAddr);}
             ShareOnClient clientInstance = new ShareOnClient(sServerAddr);
-        } else {ShareOnClient clientInstance = new ShareOnClient("localhost");}
+        } else {ShareOnClient clientInstance = new ShareOnClient("192.168.1.200");}
 
         
     }
