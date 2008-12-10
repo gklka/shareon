@@ -363,19 +363,14 @@ public class ShareOnClient {
         String sPeer;       //source peer ip address
         String sFile;       //filename to download
         Socket sSocket;     //socket for transfer
-        int iProgress;
         javax.swing.ProgressMonitor pm;
         
         
         public DownThread(String _sPeer, String _sFile, javax.swing.ProgressMonitor _pm) {
             sPeer = _sPeer;
             sFile = _sFile;
-            iProgress = 0;
             pm = _pm;
-            run();
         }
-        
-        public int getProgress() {return iProgress;}
         
         //the actual downloading happens below
         @Override
@@ -394,11 +389,14 @@ public class ShareOnClient {
                 byte[] buffer = new byte[iBufferSize];
                 FileOutputStream fos = new FileOutputStream("./_downloaded/"+sFile);
                 int bytesRead;
+                int pmProgress = 0;
                 pm.setMaximum(iFileSize);
+                pm.setProgress(0);
+                System.out.println("Maximum is: "+pm.getMaximum()+" pm is: "+pm.toString());
                 while ((bytesRead = bis.read(buffer)) != -1) {
                     fos.write(buffer, 0, bytesRead);
-                    iProgress += bytesRead;
-                    pm.setProgress(iProgress);
+                    pmProgress += bytesRead;
+                    pm.setProgress(pmProgress);
                 }
                 dis.close();
                 fos.flush();
@@ -406,15 +404,16 @@ public class ShareOnClient {
                 dos.close();
                 System.out.println(" (" + this.getId() + ") Download completed");
                 sSocket.close();
+                pm.close();
             } catch (UnknownHostException ex) {
-                ex.printStackTrace();
+                System.err.println("Network error: Unknown host!\n("+ex.getMessage()+")");
             } catch (IOException ex) {
-                ex.printStackTrace();
+                System.err.println("I/O error occurred while downloading!\n("+ex.getMessage()+")");
             } finally {
                 try {
                     sSocket.close();
                 } catch (IOException e2) {
-                    e2.printStackTrace();
+                    System.err.println("I/O error occurred while closing download socket!\n("+e2.getMessage()+")");
                 }
             }
         }
@@ -460,12 +459,12 @@ public class ShareOnClient {
                         System.out.println("  (" + this.getId() + ") completed");
                         sSocket.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.err.println("I/O error occured while uploading!\n("+e.getMessage()+")");
                     } finally {
                         try {
                             sSocket.close();
                         } catch (IOException e2) {
-                            e2.printStackTrace();
+                            System.err.println("I/O error occured while closing upload socket\n("+e2.getMessage()+")");
                         }
                     }
                 }
@@ -487,12 +486,12 @@ public class ShareOnClient {
                         upload_thread.start();
                         uploadsocket.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.err.println("I/O error occurred while creating serversocket!\n("+e.getMessage()+")");
                     } finally {
                         try {
                             uploadsocket.close();
                         } catch (IOException e2) {
-                            e2.printStackTrace();
+                            System.err.println("I/O error occurred while closing serversocket!\n("+e2.getMessage()+")");
                         }
                     }
             }

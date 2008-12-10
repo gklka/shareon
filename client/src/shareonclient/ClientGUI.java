@@ -17,6 +17,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.ProgressMonitor;
 import shareonclient.ShareOnClient.ParsedShareOn;
 import shareonclient.ShareOnClient.DownThread;
 
@@ -31,6 +32,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
     private Hashtable<String, File> hSharedFiles;   //hashtable to maintain the shared files
     private Vector<String> vSharedFileNames;        //vector to maintain the names of the shared files
     private Vector<String> vSearchResults;          //vector to maintain the search results
+    public ProgressMonitor progressMonitor;
     
     /** Creates new form ClientGUI */
     public ClientGUI(ShareOnClient ownerClientIn) {
@@ -446,10 +448,10 @@ if (evt.getSource() == jDownloadButton)
                 String sFile = sTemp[0];
                 ShareOnClient sourceShareOn = getOwnerClient();
                 
-                javax.swing.ProgressMonitor progressMonitor = new javax.swing.ProgressMonitor(ClientGUI.this,"Downloading: "+sFile,"wazap", 0, 100);
-                                                
+                progressMonitor = new ProgressMonitor(null,"Downloading: "+sFile,"", 0, 100);
+                                                                
                 DownThread downThread = sourceShareOn.new DownThread(sPeer, sFile, progressMonitor);
-                downThread.run();
+                downThread.start();
             }
         }    
 }//GEN-LAST:event_jDownloadButtonActionPerformed
