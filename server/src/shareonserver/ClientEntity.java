@@ -31,6 +31,7 @@ class ClientEntity implements Runnable
             {
             sServer = sServerIn;
             callerServer = callerServerIn;
+            sClientIP = (sServer.getInetAddress()).toString().substring(1);
             }
 
         public void run ()
@@ -40,7 +41,6 @@ class ClientEntity implements Runnable
                 //create socket and streams
                 pwOut = new PrintWriter(sServer.getOutputStream(), true);
                 buffIn = new BufferedReader(new InputStreamReader(sServer.getInputStream()));
-                sClientIP = (sServer.getInetAddress()).toString().substring(1);
                 String sLine;
                 while(!(sLine = buffIn.readLine()).equals("logout"))
                     {

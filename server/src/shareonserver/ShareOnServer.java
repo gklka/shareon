@@ -107,8 +107,8 @@ public class ShareOnServer {
                 //and start threads to interact with them simultaneously
                 ClientEntity clientConnecting = new ClientEntity(sServer, this);
                 Thread tClient = new Thread(clientConnecting);
-                System.out.println(clientConnecting.getClientIP() + ": client successfully connected!");
                 tClient.start();
+                System.out.println(clientConnecting.getClientIP() + ": client successfully connected!");
                 }
             }
          catch (IOException e)
