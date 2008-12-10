@@ -18,6 +18,7 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import shareonclient.ShareOnClient.ParsedShareOn;
+import shareonclient.ShareOnClient.DownThread;
 
 /**
  *
@@ -26,7 +27,7 @@ import shareonclient.ShareOnClient.ParsedShareOn;
 
 public class ClientGUI extends javax.swing.JFrame implements ActionListener, WindowListener{
     
-    private ShareOnClient ownerClient;              //ShareOn Client who owns the GUI
+    public ShareOnClient ownerClient;              //ShareOn Client who owns the GUI
     private Hashtable<String, File> hSharedFiles;   //hashtable to maintain the shared files
     private Vector<String> vSharedFileNames;        //vector to maintain the names of the shared files
     private Vector<String> vSearchResults;          //vector to maintain the search results
@@ -48,6 +49,11 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         jAddShareButton.addActionListener(this);
         jRemoveShareButton.addActionListener(this);
         jSearchButton.addActionListener(this);
+    }
+    
+    public ShareOnClient getOwnerClient()
+    {
+        return ownerClient;
     }
     
     //ActionListener
@@ -80,7 +86,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                     Vector<String> sFiles = new Vector<String>();
                     for (int i = 0; i < sPeersAndFiles.length; i++)
                     {
-                        String[] temp = sPeersAndFiles[i].split("-");
+                        String[] temp = sPeersAndFiles[i].split("#-#");
                         sPeers.add(temp[0]);
                         sFiles.add(temp[1]);
                     }
@@ -427,13 +433,16 @@ if (evt.getSource() == jDownloadButton)
             }
             else 
             {
-                JOptionPane.showMessageDialog(this, "Downloading file: " + jResultsList.getSelectedValue().toString() + "\nPlease wait...", "Downloading", JOptionPane.INFORMATION_MESSAGE);
                 String[] sFileAndPeer = jResultsList.getSelectedValue().toString().split(" File: ");
                 String[] sTemp = sFileAndPeer[1].split(" Peer: ");
                 String sPeer = sTemp[1];
                 String sFile = sTemp[0];
-                ownerClient.startDownload(sPeer, sFile);                
+                ShareOnClient sourceShareOn = getOwnerClient();
                 
+                javax.swing.ProgressMonitor progressMonitor = new javax.swing.ProgressMonitor(ClientGUI.this,"Downloading: "+sFile,"wazap", 0, 100);
+                                                
+                DownThread downThread = sourceShareOn.new DownThread(sPeer, sFile, progressMonitor);
+                downThread.run();
             }
         }    
 }//GEN-LAST:event_jDownloadButtonActionPerformed
@@ -472,5 +481,4 @@ if (evt.getSource() == jDownloadButton)
     private javax.swing.JScrollPane jSharesScrollPane;
     private javax.swing.JLabel jStatusLabel;
     // End of variables declaration//GEN-END:variables
-
 }

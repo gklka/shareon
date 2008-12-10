@@ -140,7 +140,7 @@ public class ShareOnClient {
     //file chooser function
     public File chooseFile(boolean bIsShareOn)
         {
-        JFileChooser chooseFile = new JFileChooser();
+        JFileChooser chooseFile = new JFileChooser("./_share/");
         if (bIsShareOn)
             chooseFile.setFileFilter(new ShareOnFileFilter());
         chooseFile.showOpenDialog(currentGUI);
@@ -358,40 +358,53 @@ public class ShareOnClient {
         }
     
     //class for downloading
-    class DownThread extends Thread {
+    public class DownThread extends Thread {
 
         String sPeer;       //source peer ip address
         String sFile;       //filename to download
         Socket sSocket;     //socket for transfer
+        int iProgress;
+        javax.swing.ProgressMonitor pm;
         
-        public DownThread(String _sPeer, String _sFile) {
+        
+        public DownThread(String _sPeer, String _sFile, javax.swing.ProgressMonitor _pm) {
             sPeer = _sPeer;
             sFile = _sFile;
+            iProgress = 0;
+            pm = _pm;
             run();
         }
-
+        
+        public int getProgress() {return iProgress;}
+        
         //the actual downloading happens below
         @Override
         public void run() {
             try {
-                //System.out.println("  (" + this.getId() + ") Attempting download of (" + sFile + ") from <" + sPeer + ":" + iFileTransferPort + ">");
+                System.out.println("  (" + this.getId() + ") Attempting download of (" + sFile + ") from <" + sPeer + ":" + iFileTransferPort + ">");
                 sSocket = new Socket(sPeer, iFileTransferPort);
-                //System.out.println("  (" + this.getId() + ") Downloading (" + sFile + ") from <" + sSocket.getInetAddress() + ">");
+                System.out.println("  (" + this.getId() + ") Downloading (" + sFile + ") from <" + sSocket.getInetAddress() + ">");
                 DataOutputStream dos = new DataOutputStream(sSocket.getOutputStream());
                 dos.writeUTF(sFile);
                 dos.flush();
+                DataInputStream dis = new DataInputStream(sSocket.getInputStream());
+                int iFileSize = dis.readInt();
+                System.out.println("File size: "+iFileSize);
                 BufferedInputStream bis = new BufferedInputStream(sSocket.getInputStream());
-
                 byte[] buffer = new byte[iBufferSize];
-                FileOutputStream fos = new FileOutputStream(sFile);
+                FileOutputStream fos = new FileOutputStream("./_downloaded/"+sFile);
                 int bytesRead;
+                pm.setMaximum(iFileSize);
                 while ((bytesRead = bis.read(buffer)) != -1) {
                     fos.write(buffer, 0, bytesRead);
+                    iProgress += bytesRead;
+                    pm.setProgress(iProgress);
                 }
+                dis.close();
                 fos.flush();
                 fos.close();
                 dos.close();
-                //System.out.println(" (" + this.getId() + ") completed");
+                System.out.println(" (" + this.getId() + ") Download completed");
                 sSocket.close();
             } catch (UnknownHostException ex) {
                 ex.printStackTrace();
@@ -426,8 +439,12 @@ public class ShareOnClient {
                     try {
                         DataInputStream dis = new DataInputStream(sSocket.getInputStream());
                         String filename = dis.readUTF();
-                        //System.out.println("  (" + this.getId() + ") Uploading (" + filename + ") to <" + sSocket.getInetAddress() + ">");
-                        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(filename));
+                        File fUpFile = new File("./_share/"+filename);
+                        DataOutputStream dos = new DataOutputStream(sSocket.getOutputStream());
+                        dos.writeInt((int)fUpFile.length());
+                        dos.flush();
+                        System.out.println("  (" + this.getId() + ") Uploading (" + filename + ") to <" + sSocket.getInetAddress() + ">");
+                        BufferedInputStream bis = new BufferedInputStream(new FileInputStream("./_share/"+filename));
                         BufferedOutputStream bos = new BufferedOutputStream(sSocket.getOutputStream());
 
                         byte[] buffer = new byte[iBufferSize];
@@ -435,12 +452,12 @@ public class ShareOnClient {
                         while ((bytesRead = bis.read(buffer)) != -1) {
                             bos.write(buffer, 0, bytesRead);
                         }
-
                         bos.flush();
+                        dos.close();
                         dis.close();
                         bis.close();
                         bos.close();
-                        //System.out.println("  (" + this.getId() + ") completed");
+                        System.out.println("  (" + this.getId() + ") completed");
                         sSocket.close();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -461,11 +478,11 @@ public class ShareOnClient {
                 //infinte loop, waiting for connections
                 while (true) {
                     try {
-                        //System.out.println("Creating serversocket on port"+iFileTransferPort);
+                        System.out.println("Creating server socket on port "+iFileTransferPort);
                         uploadsocket = new ServerSocket(iFileTransferPort);
-                        //System.out.println("Uploadsocket created: ---"+uploadsocket.toString());
+                        System.out.println("Server socket created ("+uploadsocket.toString()+")");
                         Socket client = uploadsocket.accept();
-                        //System.out.println("Uploadsocket accept happened ---"+client.toString());
+                        System.out.println("Incoming download request from: "+client.toString());
                         UploadThread upload_thread = new UploadThread(client);
                         upload_thread.start();
                         uploadsocket.close();
@@ -480,13 +497,6 @@ public class ShareOnClient {
                     }
             }
         }
-    }
-    
-    //start a new thread for download
-    public void startDownload(String sSourceIP, String sFileName)
-    {
-        DownThread download_thread = new DownThread(sSourceIP, sFileName);
-        download_thread.start();
     }
     
     //validate optional IP address
