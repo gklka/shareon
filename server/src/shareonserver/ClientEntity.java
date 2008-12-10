@@ -51,9 +51,15 @@ class ClientEntity implements Runnable
                         String[] sSplit = sLine.split("@");
                         boolean bSuccess = callerServer.executeUpload(sClientIP, sSplit[1], "ABCD");
                         if (bSuccess)
+                            {
                             pwOut.println("ACK");
+                            System.out.println("Content shared by " + sClientIP + ": " + sSplit[1]);
+                            }
                         else
+                            {
                             pwOut.println("NACK");
+                             System.err.println("Content share faliure with " + sClientIP + ": " + sSplit[1]);
+                            }
                         }
                     
                     //shared file removed
@@ -62,9 +68,15 @@ class ClientEntity implements Runnable
                         String[] sSplit = sLine.split("@");
                         boolean bSuccess = callerServer.executeDelete(sSplit[1], sClientIP);
                         if (bSuccess)
+                            {
                             pwOut.println("ACK");
+                            System.out.println("Content removed by " + sClientIP + ": " + sSplit[1]);
+                            }
                         else
+                            {
                             pwOut.println("NACK");
+                            System.out.println("Content remove faliure with " + sClientIP + ": " + sSplit[1]);
+                            }
                         }
                     
                     //request to identify the outer IP address of the connected client
@@ -100,5 +112,10 @@ class ClientEntity implements Runnable
                 callerServer.removeClientShares(sClientIP);
                 callerServer.disconnect();
                 }
+            }
+        
+        public String getClientIP()
+            {
+            return sClientIP;
             }
         }
