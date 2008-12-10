@@ -56,6 +56,11 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         return ownerClient;
     }
     
+    public Hashtable<String,File> getSharedFiles()
+        {
+        return hSharedFiles;
+        }
+    
     //ActionListener
     public void actionPerformed(ActionEvent e)
     {
@@ -69,6 +74,8 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         //logout
         if (e.getSource() == jLogoutButton)
             {
+            hSharedFiles.clear();
+            vSharedFileNames.clear();
             ownerClient.disconnectFromServer();
             }
         

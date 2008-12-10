@@ -512,7 +512,7 @@ public class ShareOnClient {
             validIPAddress(sServerAddr);
             //if (validIPAddress(sServerAddr)) {ShareOnClient clientInstance = new ShareOnClient(sServerAddr);}
             ShareOnClient clientInstance = new ShareOnClient(sServerAddr);
-        } else {ShareOnClient clientInstance = new ShareOnClient("192.168.1.200");}
+        } else {ShareOnClient clientInstance = new ShareOnClient("localhost");}
 
         
     }
