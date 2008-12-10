@@ -201,7 +201,7 @@ public class ShareOnServer {
             ResultSet searchResults = pstmt.getResultSet();
             while (searchResults.next())
                 {
-                sResults += searchResults.getString(4) + "-" + searchResults.getString(2) + "@";
+                sResults += searchResults.getString(4) + "#-#" + searchResults.getString(2) + "@";
                 }
             //return the results (cut down the last '@')
             if (sResults.equals(""))
