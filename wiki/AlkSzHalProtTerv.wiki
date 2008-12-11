@@ -1,6 +1,6 @@
 #summary Alkalmazási szintű hálózati protokoll tervezése
 
-= Bevezető =
+= Feladat =
 
 Az első feladat egy alkalmazási szintű hálózati protokoll tervezése volt:<br>
 -kísérleti fájlcserélő rendszer protokolljának meghatározása<br>
