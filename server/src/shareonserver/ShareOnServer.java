@@ -81,7 +81,16 @@ public class ShareOnServer {
         System.out.println("Establishing ShareOn server socket at port " + serverPort);
     
         socketListen = new ServerSocket(serverPort);
-        System.out.println("Server successfully established!");
+        try
+        {
+            InetAddress thisIp = InetAddress.getLocalHost();
+            System.out.println("Server successfully established! ("+thisIp.getHostAddress()+")");
+        } catch(UnknownHostException e)
+        {
+            System.err.println("Unknown host error! ("+e.getLocalizedMessage()+")");
+        }
+
+        
     
         // this server is an indeed ultimate one, it can manage up to 100 connections
         System.out.println("Awaiting connections!");
