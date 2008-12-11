@@ -590,27 +590,37 @@ public class ShareOnClient {
                         DataInputStream dis = new DataInputStream(sSocket.getInputStream());
                         String filename = dis.readUTF();
                         Hashtable<String, File> sharedFiles = currentGUI.getSharedFiles();
-                        File fUpFile = sharedFiles.get(filename);
-                        System.out.println("File is:"+fUpFile.getAbsolutePath());
-                        DataOutputStream dos = new DataOutputStream(sSocket.getOutputStream());
-                        dos.writeInt((int)fUpFile.length());
-                        dos.flush();
-                        System.out.println("  (" + this.getId() + ") Uploading (" + filename + ") to <" + sSocket.getInetAddress() + ">");
-                        BufferedInputStream bis = new BufferedInputStream(new FileInputStream( fUpFile.getAbsolutePath() ));
-                        BufferedOutputStream bos = new BufferedOutputStream(sSocket.getOutputStream());
+                        try
+                        {
+                            File fUpFile = sharedFiles.get(filename);
+                            if (fUpFile.exists())
+                            {
+                                System.out.println("File is:"+fUpFile.getAbsolutePath());
+                                DataOutputStream dos = new DataOutputStream(sSocket.getOutputStream());
+                                dos.writeInt((int)fUpFile.length());
+                                dos.flush();
+                                System.out.println("  (" + this.getId() + ") Uploading (" + filename + ") to <" + sSocket.getInetAddress() + ">");
+                                BufferedInputStream bis = new BufferedInputStream(new FileInputStream( fUpFile.getAbsolutePath() ));
+                                BufferedOutputStream bos = new BufferedOutputStream(sSocket.getOutputStream());
 
-                        byte[] buffer = new byte[iBufferSize];
-                        int bytesRead;
-                        while ((bytesRead = bis.read(buffer)) != -1) {
-                            bos.write(buffer, 0, bytesRead);
+                                byte[] buffer = new byte[iBufferSize];
+                                int bytesRead;
+                                while ((bytesRead = bis.read(buffer)) != -1)
+                                {
+                                    bos.write(buffer, 0, bytesRead);
+                                }
+                                bos.flush();
+                                dos.close();
+                                dis.close();
+                                bis.close();
+                                bos.close();
+                                System.out.println("  (" + this.getId() + ") completed");
+                            }
+                        
+                        } catch (NullPointerException nex)
+                        {
+                            System.err.println("Requested file not found! ("+nex.getLocalizedMessage()+")");
                         }
-                        bos.flush();
-                        dos.close();
-                        dis.close();
-                        bis.close();
-                        bos.close();
-                        System.out.println("  (" + this.getId() + ") completed");
-                        sSocket.close();
                     } catch (IOException e) {
                         System.err.println("I/O error occured while uploading!\n("+e.getMessage()+")");
                     } finally {
