@@ -134,20 +134,26 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         //load .shareon
         if (e.getSource() == jAddShareOnButton)
             {
-            File fShareOn = ownerClient.chooseFile(true);
-            if (fShareOn != null)
-                {
-                ParsedShareOn psPeers = ownerClient.parseShareOn(fShareOn);
-                if (psPeers == null)
-                    JOptionPane.showMessageDialog(this, "Invalid ShareOn syntax!", "Error!", JOptionPane.ERROR_MESSAGE);
-                else
+            if (ownerClient.isConnectedToServer())
+            {
+                File fShareOn = ownerClient.chooseFile(true);
+                if (fShareOn != null)
                     {
-                    //update result list
-                    jResultsList = new javax.swing.JList(psPeers.getDisplayableResults());
-                    jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                    jResultsScrollPane.setViewportView(jResultsList);
+                    ParsedShareOn psPeers = ownerClient.parseShareOn(fShareOn);
+                    if (psPeers == null)
+                        JOptionPane.showMessageDialog(this, "Invalid ShareOn syntax!", "Error!", JOptionPane.ERROR_MESSAGE);
+                    else
+                        {
+                        //update result list
+                        jResultsList = new javax.swing.JList(psPeers.getDisplayableResults());
+                        jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                        jResultsScrollPane.setViewportView(jResultsList);
+                        }
                     }
-                }
+            } else
+            {
+                JOptionPane.showMessageDialog(this, "Please login first!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            }
             }
         
         //add shared file

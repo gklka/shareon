@@ -469,7 +469,7 @@ public class ShareOnClient {
             while (vIter.hasNext())
                 {
                 String sRTT = (String)vIter.next();
-                vDisplayableResults.add("RTT(ms): " + sRTT + " Peer: " + hPeers.get(sRTT));
+                vDisplayableResults.add("RTT(ms): " + sRTT + " File: "+ sFileName +" Peer: " + hPeers.get(sRTT));
                 }
             }
         public String getFilename() { return sFileName; }
@@ -543,7 +543,6 @@ public class ShareOnClient {
                 int pmProgress = 0;
                 pm.setMaximum(iFileSize);
                 pm.setProgress(0);
-                System.out.println("Maximum is: "+pm.getMaximum()+" pm is: "+pm.toString());
                 while ((bytesRead = bis.read(buffer)) != -1) {
                     fos.write(buffer, 0, bytesRead);
                     pmProgress += bytesRead;
