@@ -51,4 +51,8 @@ tartalom eltávolítása: "alnremoved@"(fájlnév)"@"(IP) - Egy ALN-en kapcsoló
 
 tartalom keresése: "search@"(fájlnév) - Tartalom keresése. ALN-en kapcsolódó peer-ek esetén ugyanez a függvény használatos.
 
-ALN peer kijelentekezése
+ALN peer kijelentekezése: "alnlogout@"(IP) - ALN-en kapcsoolódó peer kijelentkezése.
+
+Az ALN kommunikációban használt függvények a kommunikáció jellege miatt szükségesek, ugyanis az ALN segítségével továbbított üzenetek feladója nem feltétlenül egyezik az eredeti feladóval. Így megosztás, törlés, és kijelentkezés esetén szükséges megjelölni az eredeti feladót. Keresés esetén viszont ez teljesen lényegtelen, ugyanis a válasz az ALN-en visszafelé fog terjedni a feladó felé, anélkül, hogy ismernünk kellene a kérés forrását.
+
+= Kliens =
