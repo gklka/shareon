@@ -63,6 +63,23 @@ class ClientEntity implements Runnable
                             }
                         }
                     
+                    //shared file added via ALN
+                    if (sLine.startsWith("alnadded@"))
+                        {
+                        String[] sSplit = sLine.split("@");
+                        boolean bSuccess = callerServer.executeUpload(sSplit[2], sSplit[1], "ABCD");
+                        if (bSuccess)
+                            {
+                            pwOut.println("ACK");
+                            System.out.println("Content shared by " + sSplit[2] + ": " + sSplit[1]);
+                            }
+                        else
+                            {
+                            pwOut.println("NACK");
+                             System.err.println("Content share faliure with " + sSplit[2] + ": " + sSplit[1]);
+                            }
+                        }
+                    
                     //shared file removed
                     if (sLine.startsWith("removed@"))
                         {
@@ -80,6 +97,23 @@ class ClientEntity implements Runnable
                             }
                         }
                     
+                    //shared file removed via ALN
+                    if (sLine.startsWith("alnremoved@"))
+                        {
+                        String[] sSplit = sLine.split("@");
+                        boolean bSuccess = callerServer.executeDelete(sSplit[1], sSplit[2]);
+                        if (bSuccess)
+                            {
+                            pwOut.println("ACK");
+                            System.out.println("Content removed by " + sSplit[2] + ": " + sSplit[1]);
+                            }
+                        else
+                            {
+                            pwOut.println("NACK");
+                            System.out.println("Content remove faliure with " + sSplit[2] + ": " + sSplit[1]);
+                            }
+                        }
+                    
                     //request to identify the outer IP address of the connected client
                     /* deprecated since ALM implementation
                     if (sLine.equals("IP"))
@@ -91,8 +125,16 @@ class ClientEntity implements Runnable
                     if (sLine.startsWith("search@"))
                         {
                         String[] sSplit = sLine.split("@");
+                        //System.out.println(sSplit[1]);
                         String sResults = callerServer.searchFile(sSplit[1]);
                         pwOut.println(sResults);
+                        }
+                    
+                    //ALN disconnect request
+                    if (sLine.startsWith("alnlogout@"))
+                        {
+                        String[] sSplit = sLine.split("@");
+                        callerServer.removeClientShares(sSplit[1]);
                         }
                     }
                 //once the client logs out, we clean up the mess
@@ -101,6 +143,7 @@ class ClientEntity implements Runnable
                 pwOut.close();
                 buffIn.close();
                 sServer.close();
+                return;
                 }
             catch (IOException e)
                 {

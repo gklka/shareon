@@ -181,6 +181,7 @@ public class ShareOnServer {
             PreparedStatement pstmt = dbConnection.prepareStatement("DELETE FROM shares WHERE ip = ?;");
             pstmt.setString(1, sIP);
             pstmt.executeUpdate();
+            System.err.println("Shares of " + sIP + " removed successfully after logout!");
             }
         catch (SQLException e)
             {
