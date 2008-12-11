@@ -8,4 +8,47 @@
 
 = A szerver és a kliens alkalmazások =
 
-A feladatkiírás nem jelölt meg konkrét programnyelvet, melyen a feladatot meg kellett valósítanunk, ezért a JAVA programnyelv mellett döntöttünk, mivel ez a programnyelv platformfüggetlenséget kínál felhasználói számára
+A feladatkiírás nem jelölt meg konkrét programnyelvet, melyen a feladatot meg kellett valósítanunk, ezért a JAVA programnyelv mellett döntöttünk, mivel ez a programnyelv platformfüggetlenséget kínál felhasználói számára. A projektet Netbeans környezetben valósítottuk meg.
+
+= Szerver =
+
+A szerver program két osztályt foglal magába: ShareOnServer, ClientEntity
+
+ShareOnServer
+
+A szerver induláskor először bejelentkezik a Turul szerverre, ahol ellenőrzi, hogy megtalálható-e a shares nevű tábla. Amennyiben nem, létrehozza azt. (Az adatbázissal való kapcsolattartáshoz a Sun által szállított  JDBC drivert használunk.)
+Amennyiben sikeres volt a bejelentkezés a szerverre, elindul a runServer() függvény, amely létrehozza a socket-et, melyen a szerver hallgat. Ez a függvény minden peer bejelentkezése esetén egy új szálat indít, amely felelős az adott peer-el való kommunikációért.
+
+A szerver felelős az SQL adatbázis karbantartásáért, melyet a peer-ekkel való kommunikáció alapján visz véghez. A kliensekkel történő kommunikációról később. A szerver a következő függvényeket használja a szerverrel való kommunikációra:
+
+disconnect(): Csökkenti az aktíc kapcsolatok számát, így az nem telítődik inaktív kapcsolatokkal.
+
+executeUpload(): Preparedstatement segítségével beszúr egy megosztást a megosztások táblázatába.
+
+executeDelete(): Preparedstatement segítségével töröl egy rekordot az adatbázisból.
+
+removeClientShares(): Kijelentkezés, illetve "ungraceful departure" esetén eltávolítja az adott peer által megosztott fájlokat.
+
+searchFile(): keresési kérést intéz a szerverhez, majd visszatér a talált fájlokat megosztó peer-ek IP-jével, és a fájlok neveivel (#-#, és @ elválasztójelekkel)
+
+getRandomClient(): Visszatér egy az adatbázisból véletlenszerűen kiválasztott peer-el (ALN esetben használt).
+
+
+ClientEntity
+
+A ClientEntity osztály felelős a peer-ekkel folytatott kommunikációért. Minden egyes ilyen osztály egy szerver-peer kapcsolatot reprezentál, és a konstruktor paramétereiként kapott változók segítségével kommunikál a szerverrel. A kommunikáció addig folyik, míg a kliens egy "logout" üzenetet nem küld, ekkor a socket-ek, és a stream-ek bezárulnak, az osztály által használt erőforrásokat pedig felszabadítja a garbage collector.
+Ha a szerverhez egy új peer jelentkezik be, külön szálon elindul a ClientEntity osztálynak egy pédánya, mely létrehozza a szükséges stream-eket a kommunikációhoz, majd elküldi a kliensnek az IP-jét. Az IP elküldése azért szükséges, mert JAVA környezetben csak igen bonyolultan lehet megvalósítani az IP cím lekérdezését.
+
+A peer-ekkel folytatott kommunikáció szöveges üzenetekkel történik, ezek a következőek lehetnek:
+
+tartalom megosztása: "added@"(fájlnév) - A peer egy új állományt osztott meg.
+
+tartalom megosztása: "alnadded@"(fájlnév)"@"(IP) -Egy ALN-en kapcsolódó peer egy új állományt osztott meg.
+
+tartalom eltávolítása: "removed@"(fájlnév) - A peer megosztást távolított el.
+
+tartalom eltávolítása: "alnremoved@"(fájlnév)"@"(IP) - Egy ALN-en kapcsolódó peer megosztást távolított el.
+
+tartalom keresése: "search@"(fájlnév) - Tartalom keresése. ALN-en kapcsolódó peer-ek esetén ugyanez a függvény használatos.
+
+ALN peer kijelentekezése
