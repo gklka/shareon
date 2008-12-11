@@ -41,6 +41,7 @@ class ClientEntity implements Runnable
                 //create socket and streams
                 pwOut = new PrintWriter(sServer.getOutputStream(), true);
                 buffIn = new BufferedReader(new InputStreamReader(sServer.getInputStream()));
+                pwOut.println(sClientIP + "@" + callerServer.getRandomClient());
                 String sLine;
                 while(!(sLine = buffIn.readLine()).equals("logout"))
                     {
@@ -80,9 +81,11 @@ class ClientEntity implements Runnable
                         }
                     
                     //request to identify the outer IP address of the connected client
+                    /* deprecated since ALM implementation
                     if (sLine.equals("IP"))
                         pwOut.println(sClientIP);
                         //pwOut.println(sServer.getRemoteSocketAddress());
+                    */
                     
                     //search request
                     if (sLine.startsWith("search@"))

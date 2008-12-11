@@ -213,7 +213,35 @@ public class ShareOnServer {
             {
             System.err.println("Error occured while searching!");
             System.err.println("Details: " + e.toString());
-            return null;
+            return "";
+            }
+        }
+    
+    //function to get random ALM client for the newly joined one
+    public String getRandomClient()
+        {
+        try
+            {
+            String sResult = "";
+            //we choose a random IP
+            PreparedStatement pstmt = dbConnection.prepareStatement("SELECT ip FROM shares ORDER BY RAND() LIMIT 1;");
+            pstmt.execute();
+            ResultSet searchResult = pstmt.getResultSet();
+            if (searchResult.next())
+                {
+                sResult = searchResult.getString(1);
+                return sResult;
+                }
+            else
+                {
+                return "";
+                }
+            }
+        catch (SQLException e)
+            {
+            System.err.println("Error occured while returning ALM server candidate!");
+            System.err.println("Details: " + e.toString());
+            return "";
             }
         }
     
