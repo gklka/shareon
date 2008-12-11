@@ -77,6 +77,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         if (e.getSource() == jLogoutButton)
             {
             flushShares();
+            flushResults();
             ownerClient.disconnectFromServer();
             }
         
@@ -224,6 +225,17 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         {
         hSharedFiles.clear();
         vSharedFileNames.clear();
+        jSharesList = new javax.swing.JList(vSharedFileNames);
+        jSharesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jSharesScrollPane.setViewportView(jSharesList);
+        }
+    
+    public void flushResults()
+        {
+        vSearchResults.clear();
+        jResultsList = new javax.swing.JList(vSearchResults);
+        jResultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jResultsScrollPane.setViewportView(jResultsList);
         }
     
     //WindowListener

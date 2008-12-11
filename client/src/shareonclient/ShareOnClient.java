@@ -35,9 +35,9 @@ public class ShareOnClient {
     private int iFileTransferPort = 30005;          //port for uploading file
     private UploadListenerThread uploadListener;    //listener for file uploads
     private Thread tUploadListener;
-    private ALNListenerThread alnListener;          //listener to alm messages
+    private ALNListenerThread alnListener;          //listener to ALN messages
     private Thread tALNListener;
-    private int iALMPort = 30010;                   //ALM listener port
+    private int iALNPort = 30010;                   //ALM listener port
     private final int iBufferSize = 1048576;        //buffer size for file transfer
     private String sServerIP;                       //IP address of server
     private boolean bServerSockedUsed;              //is the server socket used?
@@ -56,7 +56,7 @@ public class ShareOnClient {
         uploadListener = new UploadListenerThread();
         tUploadListener = new Thread(uploadListener);
         tUploadListener.start();
-        alnListener = new ALNListenerThread(this, iALMPort);
+        alnListener = new ALNListenerThread(this, iALNPort);
         tALNListener = new Thread(alnListener);
         tALNListener.start();
         currentListener = new PseudoPingListener();
@@ -87,7 +87,7 @@ public class ShareOnClient {
                 if (sInitSplit.length != 1)
                     {
                     int answer = JOptionPane.showConfirmDialog(currentGUI,
-                                                               "It is possible to connect to the server via ALN network\n" +
+                                                               "It is possible to connect to the server via ALN\n" +
                                                                "Your connection provider would be: " + sInitSplit[1] + "\n" +
                                                                "Would you like to switch to ALN?",
                                                                "ALN connection",
@@ -145,7 +145,7 @@ public class ShareOnClient {
             {
             try 
                 {
-                serverSocket = new Socket(sALNIP, iALMPort);
+                serverSocket = new Socket(sALNIP, iALNPort);
                 out = new PrintWriter(serverSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
                 bConnected = true;
@@ -208,6 +208,7 @@ public class ShareOnClient {
         try
             {
             currentGUI.flushShares();
+            currentGUI.flushResults();
             in.close();
             out.close();
             serverSocket.close();
@@ -300,7 +301,23 @@ public class ShareOnClient {
             {
             System.err.println("Error executing search!");
             System.err.println("Details: " + e.toString());
-            JOptionPane.showMessageDialog(currentGUI, "Couldn't perform search!\nServer is unreachable!\nClient will now disconnect!", "Error!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(currentGUI, "Couldn't perform search!\n" +
+                                          "(If you haven't searched, a member of your ALN had)\n" +
+                                          "Server is unreachable!\n" +
+                                          "Client will now disconnect!",
+                                          "Error!", JOptionPane.ERROR_MESSAGE);
+            flushConnection();
+            return null;
+            }
+        catch (NullPointerException e)
+            {
+            System.err.println("Error executing search!");
+            System.err.println("Details: " + e.toString());
+            JOptionPane.showMessageDialog(currentGUI, "Couldn't perform search!\n" +
+                                          "(If you haven't searched, a member of your ALN had)\n" +
+                                          "Server is unreachable!\n" +
+                                          "Client will now disconnect!",
+                                          "Error!", JOptionPane.ERROR_MESSAGE);
             flushConnection();
             return null;
             }
@@ -308,24 +325,25 @@ public class ShareOnClient {
     
     //function to forward ALM messages 
     //(NOTE: socket semaphors are handled in the ALM thread)
-    public String forwardALMMessage(String sMessageIn)
+    public String forwardALNMessage(String sMessageIn, String sOriginIPIn)
         {
+        //System.out.println(sMessageIn);
         try
             {
-            out.println(sMessageIn);
-            String sReply = in.readLine();
-            if (sReply.equals(""))
-                return null;
+            if ((!sMessageIn.startsWith("aln")) && (!sMessageIn.startsWith("search")))
+                out.println("aln" + sMessageIn + "@" + sOriginIPIn);
             else
-                return sReply;
+                out.println(sMessageIn);
+            String sReply = in.readLine();
+            return sReply;
             }
         catch (IOException e)
             {
             System.err.println("Error forwarding ALM message!");
             System.err.println("Details: " + e.toString());
-            JOptionPane.showMessageDialog(currentGUI, "Couldn't forward ALM message!\nServer, or an ALM member is unreachable!\nClient will now disconnect!", "Error!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(currentGUI, "Couldn't forward ALM message!\nServer, or an ALM member is unreachable!\nClient will now disconnect (if it hasn't already)!", "Error!", JOptionPane.ERROR_MESSAGE);
             flushConnection();
-            return null;
+            return "@error";
             }
         }
     /**function to return local IP
@@ -336,6 +354,12 @@ public class ShareOnClient {
     public String getLocalIP()
         {
         return sLocalIP;
+        }
+    
+    //function to return the current GUI controlled by the client
+    public ClientGUI getGUI()
+        {
+        return currentGUI;
         }
     
     //send shared file updates to the server
@@ -474,6 +498,7 @@ public class ShareOnClient {
     //function to set the server socket busy or free
     public void setServerSocketUsage(boolean bInUsage)
         {
+        //System.out.println(bInUsage);
         bServerSockedUsed = bInUsage;
         }
     
