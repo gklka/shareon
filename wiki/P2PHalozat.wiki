@@ -1,0 +1,11 @@
+#summary Egyenrangú (P2P) hálózat létrehozása
+
+= Feladat =
+
+-A fájlcserélő rendszer központi kiszolgálójának és ügyfélprogramjának elkészítése<br>
+-A központi kiszolgáló egy webes felületű MySQL alapú linuxos szoftver<br>
+-Ügyfélszoftvernek Windows XP-n kell tudni működni<br>
+
+= A szerver és a kliens alkalmazások =
+
+A feladatkiírás nem jelölt meg konkrét programnyelvet, melyen a feladatot meg kellett valósítanunk, ezért a JAVA programnyelv mellett döntöttünk, mivel ez a programnyelv platformfüggetlenséget kínál felhasználói számára
