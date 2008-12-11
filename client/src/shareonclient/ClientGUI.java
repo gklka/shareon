@@ -76,8 +76,7 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         //logout
         if (e.getSource() == jLogoutButton)
             {
-            hSharedFiles.clear();
-            vSharedFileNames.clear();
+            flushShares();
             ownerClient.disconnectFromServer();
             }
         
@@ -94,11 +93,11 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                     Vector<String> sPeers = new Vector<String>();
                     Vector<String> sFiles = new Vector<String>();
                     for (int i = 0; i < sPeersAndFiles.length; i++)
-                    {
+                        {
                         String[] temp = sPeersAndFiles[i].split("#-#");
                         sPeers.add(temp[0]);
                         sFiles.add(temp[1]);
-                    }
+                        }
                     for (int i = 0; ((i < sPeers.size()) && (i < sFiles.size())); i++)
                         {
                         
@@ -219,6 +218,12 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
     public void setStatusText(String sStatusToSet)
         {
         jStatusLabel.setText("Status: " + sStatusToSet);
+        }
+    
+    public void flushShares()
+        {
+        hSharedFiles.clear();
+        vSharedFileNames.clear();
         }
     
     //WindowListener

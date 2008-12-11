@@ -32,15 +32,20 @@ public class ShareOnClient {
     private int iPingListenPort = 30001;            //port to listen to pseudoping
     private String sLocalIP;                        //string representing the local IP address
     private int iFileTransferPort = 30005;          //port for uploading file
-    private UploadListenerThread uploadListener;   //listener for file uploads
+    private UploadListenerThread uploadListener;    //listener for file uploads
     private Thread tUploadListener;
+    private ALMListenerThread almListener;          //listener to alm messages
+    private Thread tALMListener;
+    private int iALMPort = 30010;                   //ALM listener port
     private final int iBufferSize = 1048576;        //buffer size for file transfer
     private String sServerIP;                       //IP address of server
+    private boolean bServerSockedUsed;              //is the server socket used?
         
     public ShareOnClient(String sIP)
         {
         //init some values
         sServerIP = sIP;
+        setServerSocketUsage(false);
         serverSocket = null;
         out = null;
         currentGUI = new ClientGUI(this);
@@ -50,6 +55,9 @@ public class ShareOnClient {
         uploadListener = new UploadListenerThread();
         tUploadListener = new Thread(uploadListener);
         tUploadListener.start();
+        almListener = new ALMListenerThread(this, iALMPort);
+        tALMListener = new Thread(almListener);
+        tALMListener.start();
         currentListener = new PseudoPingListener();
         tPseudoPingListener = new Thread(currentListener);
         tPseudoPingListener.start();
@@ -69,8 +77,10 @@ public class ShareOnClient {
                 in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
                 bConnected = true;
                 //obtain the ip address of the client
+                setServerSocketUsage(true);
                 out.println("IP");
                 sLocalIP = in.readLine();
+                setServerSocketUsage(false);
                 break;
                 }
             //if there are errors we show some error messages
@@ -112,7 +122,10 @@ public class ShareOnClient {
         {
         if (!bConnected)
             return;
+        setServerSocketUsage(true);
         out.println("logout");
+        setServerSocketUsage(false);
+        flushConnection();
         bConnected = false;
         currentGUI.setStatusText("offline mode");
         }
@@ -122,6 +135,7 @@ public class ShareOnClient {
         {
         try
             {
+            currentGUI.flushShares();
             in.close();
             out.close();
             serverSocket.close();
@@ -201,8 +215,10 @@ public class ShareOnClient {
         {
         try
             {
+            setServerSocketUsage(true);
             out.println("search@" + sToSearch);
             String sReply = in.readLine();
+            setServerSocketUsage(false);
             if (sReply.equals(""))
                 return null;
             else
@@ -212,12 +228,34 @@ public class ShareOnClient {
             {
             System.err.println("Error executing search!");
             System.err.println("Details: " + e.toString());
-            JOptionPane.showMessageDialog(currentGUI, "Couldn't perform search!\nClient will now disconnect!", "Error!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(currentGUI, "Couldn't perform search!\nServer is unreachable!\nClient will now disconnect!", "Error!", JOptionPane.ERROR_MESSAGE);
             flushConnection();
             return null;
             }
         }
     
+    //function to forward ALM messages 
+    //(NOTE: socket semaphors are handled in the ALM thread)
+    public String forwardALMMessage(String sMessageIn)
+        {
+        try
+            {
+            out.println(sMessageIn);
+            String sReply = in.readLine();
+            if (sReply.equals(""))
+                return null;
+            else
+                return sReply;
+            }
+        catch (IOException e)
+            {
+            System.err.println("Error forwarding ALM message!");
+            System.err.println("Details: " + e.toString());
+            JOptionPane.showMessageDialog(currentGUI, "Couldn't forward ALM message!\nServer, or an ALM member is unreachable!\nClient will now disconnect!", "Error!", JOptionPane.ERROR_MESSAGE);
+            flushConnection();
+            return null;
+            }
+        }
     /**function to return local IP
      * Features that are unsupported at the moment:
      * - use of NATs (more exactly the connection of multiple users behind the same NAT)
@@ -234,9 +272,11 @@ public class ShareOnClient {
         try
             {
             //we send the update string
+            setServerSocketUsage(true);
             out.println(sUpdate);
             //and wait for answer
             String sReply = in.readLine();
+            setServerSocketUsage(false);
             if (sReply.equals("ACK"))
                 return true;
             else
@@ -246,6 +286,7 @@ public class ShareOnClient {
             {
             System.err.println("Error updating shares!");
             System.err.println("Details: " + e.toString());
+            JOptionPane.showMessageDialog(currentGUI, "Couldn't update shares!\nServer is unreachable!\nClient will now disconnect!", "Error!", JOptionPane.ERROR_MESSAGE);
             flushConnection();
             return false;
             }
@@ -347,6 +388,7 @@ public class ShareOnClient {
         {
         try
             {
+            tUploadListener.interrupt();
             tPseudoPingListener.interrupt();
             disconnectFromServer();
             out.close();
@@ -355,6 +397,18 @@ public class ShareOnClient {
             }
         catch (IOException e) {}
         System.exit(0);
+        }
+    
+    //function to set the server socket busy or free
+    public void setServerSocketUsage(boolean bInUsage)
+        {
+        bServerSockedUsed = bInUsage;
+        }
+    
+    //function to check the server socket usage
+    public boolean isServerSocketUsed()
+        {
+        return bServerSockedUsed;
         }
     
     //class for downloading
