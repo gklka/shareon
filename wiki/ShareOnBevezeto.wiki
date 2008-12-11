@@ -1,4 +1,4 @@
-#Bevezető a programról
+#summary Bevezető a programról
 
 = Bevezető =
 
