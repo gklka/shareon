@@ -3,20 +3,20 @@
 = Bevezető =
 
 Az első feladat egy alkalmazási szintű hálózati protokoll tervezése volt:
--kísérleti fájlcserélő rendszer protokolljának meghatározása
--központosított átfedő létrehozása
-   -központi kiszolgálón nyilvántartva az egyes ügyfelek által megosztott fájlok
-   -fájlcsere közvetlenül történik az ügyfelek között
-   -~Napster
+-kísérleti fájlcserélő rendszer protokolljának meghatározása<br>
+-központosított átfedő létrehozása<br>
+   -központi kiszolgálón nyilvántartva az egyes ügyfelek által megosztott fájlok<br>
+   -fájlcsere közvetlenül történik az ügyfelek között<br>
+   -~Napster<br>
 
 
 = Részletek =
 
-Egy, a Napster program protokolljához rendkívül hasonló protokollt terveztünk meg. Ennek a protokollnak a működése a következő pontokat foglalja magában:
-1. A fájlokat a kliensek (továbbiakban peer-ek) osztják meg, egyik sem található meg közvetlenül a szerveren.
-2. A megosztott fájlokat a központi kiszolgáló tartja nyilván egy SQL adatbázisban.
-3. A peer-ek bejelentkeznek a szerverre, majd ezután elkezdhetik megosztani az általuk birtokolt tartalmakat, melyeket a szerver rögzít.
-4. Amennyiben kérés érkezik a szerverhez, az megkeresi a keresett fájlt az adatbázisban, és válaszol a kereső peer-nek az eredménnyel / eredményekkel. A letöltés ezt követően a peer-ek között zajlik(lásd 1. ábra).
+Egy, a Napster program protokolljához rendkívül hasonló protokollt terveztünk meg. Ennek a protokollnak a működése a következő pontokat foglalja magában:<br>
+1. A fájlokat a kliensek (továbbiakban peer-ek) osztják meg, egyik sem található meg közvetlenül a szerveren.<br>
+2. A megosztott fájlokat a központi kiszolgáló tartja nyilván egy SQL adatbázisban.<br>
+3. A peer-ek bejelentkeznek a szerverre, majd ezután elkezdhetik megosztani az általuk birtokolt tartalmakat, melyeket a szerver rögzít.<br>
+4. Amennyiben kérés érkezik a szerverhez, az megkeresi a keresett fájlt az adatbázisban, és válaszol a kereső peer-nek az eredménnyel / eredményekkel. A letöltés ezt követően a peer-ek között zajlik(lásd 1. ábra).<br>
 5. Lehetőség van egy állományt szerver nélkül is letölteni, amennyiben a letöltő peer rendelkezik a letöltendő fájl elérési információjával(lásd 2. ábra).
 
 http://shareon.googlecode.com/files/ShareOn-protocol.png
