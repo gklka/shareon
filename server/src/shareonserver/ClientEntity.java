@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.*;
+import java.math.*;
+
 
 /**
  *
@@ -50,7 +53,19 @@ class ClientEntity implements Runnable
                     if (sLine.startsWith("added@"))
                         {
                         String[] sSplit = sLine.split("@");
-                        boolean bSuccess = callerServer.executeUpload(sClientIP, sSplit[1], "ABCD");
+                        
+                        String md5hash;
+                        try
+                        {
+                            MessageDigest m=MessageDigest.getInstance("MD5");
+                            m.update(sSplit[1].getBytes(),0,sSplit[1].length());
+                            md5hash = new BigInteger(1,m.digest()).toString(16);
+                        } catch (NoSuchAlgorithmException ex)
+                        {
+                            md5hash = "NULLNULLNULL";
+                        }
+                        
+                        boolean bSuccess = callerServer.executeUpload(sClientIP, sSplit[1], md5hash);
                         if (bSuccess)
                             {
                             pwOut.println("ACK");

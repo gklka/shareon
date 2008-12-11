@@ -37,7 +37,6 @@ public class ShareOnServer {
             System.exit(1);
             }
         System.out.println("Done loading driver!");
-        
         System.out.println("Connecting to MySQL server...");
         String sURL = "jdbc:mysql://turul.eet.bme.hu:3306/db_mk0804";
         
@@ -54,7 +53,7 @@ public class ShareOnServer {
             System.exit(1);
             }
         System.out.println("Connected!");
-        
+
         //check if the shares maintenance table exists
         try
             {
@@ -78,7 +77,7 @@ public class ShareOnServer {
             System.err.println ("Details : " + e.toString());
             System.exit(1);
             }
-        
+
         System.out.println("Establishing ShareOn server socket at port " + serverPort);
     
         socketListen = new ServerSocket(serverPort);
@@ -121,7 +120,7 @@ public class ShareOnServer {
     //function to decrease number of activ connections in case somebody disconnects
     public void disconnect() { iConnections--; }
     
-    @Override
+    //@Override
     /**
      * If the server is shut down, we must clean up all the mess we made,
      * because this is a well behaving server program :)
