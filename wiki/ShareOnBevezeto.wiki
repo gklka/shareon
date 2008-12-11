@@ -1,0 +1,11 @@
+#Bevezető a programról
+
+= Bevezető =
+
+A ShareOn projekt kliens és szerver program a Médiakommunikáció labor tantárgy keretei között készült beadandó laborfeladatként. A program egy P2P (Peer-to-peer) fájlcserélőt valósít meg, mely elsődlegesen egy Napster típusú átfedő, kiegészítve bizonyos funkciókkal, melyek lehetővé teszik, hogy a kliensek ne csupán közvetlenül a szerverhez kapcsolódjanak, hanem más kliensekhez is. Az így létrejövő ALN-ek összegyűjtik az őket alkotó kliensek szabályozási információit, és úgy juttatják el a szerverhez.
+
+A szerver-kliens, kliens-kliens kommunikáció TCP/IP alapú. A lehetőség kisebb ALN szigetek kialakítására terhelést von el a szerverről, ugyanis nem kell külön socketet fenntartania minden klienshez, csupán azokhoz, akik közvetlenül kapcsolódnak hozzá.
+
+A következő dokumentációkban leírjuk, az egyes feladatok során hozott döntéseket, alkalmazott alapelveket, valamint a feladatok megvalósítását.
+
+A feladatot JAVA nyelven valósítottuk meg, így az elkészült szerver illetve ügyfélprogram platformfüggetlenül használható.
