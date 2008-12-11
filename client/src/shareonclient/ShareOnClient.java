@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 public class ShareOnClient {
     
     private Socket serverSocket;                    //socket to connect to the server
+    private int iServerPort = 30000;                //port where the server listens
     private PrintWriter out;                        //printwriter to communicate with the server
     private BufferedReader in;                      //bufferedreader to communicate with the server
     private ClientGUI currentGUI;                   //GUI of the client              
@@ -34,8 +35,8 @@ public class ShareOnClient {
     private int iFileTransferPort = 30005;          //port for uploading file
     private UploadListenerThread uploadListener;    //listener for file uploads
     private Thread tUploadListener;
-    private ALMListenerThread almListener;          //listener to alm messages
-    private Thread tALMListener;
+    private ALNListenerThread alnListener;          //listener to alm messages
+    private Thread tALNListener;
     private int iALMPort = 30010;                   //ALM listener port
     private final int iBufferSize = 1048576;        //buffer size for file transfer
     private String sServerIP;                       //IP address of server
@@ -55,9 +56,9 @@ public class ShareOnClient {
         uploadListener = new UploadListenerThread();
         tUploadListener = new Thread(uploadListener);
         tUploadListener.start();
-        almListener = new ALMListenerThread(this, iALMPort);
-        tALMListener = new Thread(almListener);
-        tALMListener.start();
+        alnListener = new ALNListenerThread(this, iALMPort);
+        tALNListener = new Thread(alnListener);
+        tALNListener.start();
         currentListener = new PseudoPingListener();
         tPseudoPingListener = new Thread(currentListener);
         tPseudoPingListener.start();
@@ -72,14 +73,34 @@ public class ShareOnClient {
             {
             try 
                 {
-                serverSocket = new Socket(sServerIP, 30000);
+                serverSocket = new Socket(sServerIP, iServerPort);
                 out = new PrintWriter(serverSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
                 bConnected = true;
                 //obtain the ip address of the client
                 setServerSocketUsage(true);
-                out.println("IP");
-                sLocalIP = in.readLine();
+                //deprecated since ALM implementation
+                //out.println("IP");
+                String sInit = in.readLine();
+                String[] sInitSplit = sInit.split("@");
+                sLocalIP = sInitSplit[0];
+                if (sInitSplit.length != 1)
+                    {
+                    int answer = JOptionPane.showConfirmDialog(currentGUI,
+                                                               "It is possible to connect to the server via ALN network\n" +
+                                                               "Your connection provider would be: " + sInitSplit[1] + "\n" +
+                                                               "Would you like to switch to ALN?",
+                                                               "ALN connection",
+                                                               JOptionPane.YES_NO_OPTION,
+                                                               JOptionPane.QUESTION_MESSAGE);
+                    if (answer == JOptionPane.YES_OPTION)
+                        {
+                        disconnectFromServer();
+                        connectToALN(sInitSplit[1]);
+                        setServerSocketUsage(false);
+                        return;
+                        }
+                    }
                 setServerSocketUsage(false);
                 break;
                 }
@@ -114,7 +135,58 @@ public class ShareOnClient {
                 }
             }
             //if we connected successfully we update the status text
-            currentGUI.setStatusText("connected to server");
+            currentGUI.setStatusText("connected to server via direct link");
+        }
+    
+    //function to connect to ALM client
+    public void connectToALN(String sALNIP)
+        {
+        while (true)
+            {
+            try 
+                {
+                serverSocket = new Socket(sALNIP, iALMPort);
+                out = new PrintWriter(serverSocket.getOutputStream(), true);
+                in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+                bConnected = true;
+                //obtain the ip address of the client
+                setServerSocketUsage(true);
+                sLocalIP = in.readLine();
+                setServerSocketUsage(false);
+                break;
+                }
+            //if there are errors we show some error messages
+            catch (UnknownHostException e)
+                {
+                currentGUI.setStatusText("connection falied");
+                int answer = JOptionPane.showConfirmDialog(currentGUI,
+                                                           "The ALN providers host couldn't be found!\nPress YES to try again or NO otherwise!",
+                                                           "Connection error!",
+                                                           JOptionPane.YES_NO_OPTION,
+                                                           JOptionPane.ERROR_MESSAGE);
+                if (answer == JOptionPane.NO_OPTION)
+                    {
+                    currentGUI.setStatusText("offline mode");
+                    return;
+                    }
+                }
+            catch (IOException e)
+                {
+                currentGUI.setStatusText("connection falied");
+                int answer = JOptionPane.showConfirmDialog(currentGUI,
+                                                           "Couldn't get I/O for the connection to the ALN provider.\nPress YES to try again or NO otherwise!",
+                                                           "Connection error!",
+                                                           JOptionPane.YES_NO_OPTION,
+                                                           JOptionPane.ERROR_MESSAGE);
+                if (answer == JOptionPane.NO_OPTION)
+                    {
+                    currentGUI.setStatusText("offline mode");
+                    return;
+                    }
+                }
+            }
+            //if we connected successfully we update the status text
+            currentGUI.setStatusText("connected to server via ALN");
         }
     
     //unction to disconnect from server
