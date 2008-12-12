@@ -6,11 +6,12 @@ A PHP felület célja, hogy egy központi adatbázist használva, melyet a klien
 
 = Fájlok =
 
-`config.php` - a beállításokat tartalmazó fájl
-`dbfunctions.php` - az adatbáziskezeléssel kapcsolatos funkciókat tartalmazza
-`download.php` - a .shareon metafájlok generálásáért felelős
-`footer.php` - a sablon lábléc része
-`functions.php` - a listázást és a különböző lekérdezéseket megvalósító függvények
-`header.php` - fejléc sablon
-`index.php`  - a funkciók szétválasztását végzi
+`config.php` - a beállításokat tartalmazó fájl<br>
+`dbfunctions.php` - az adatbáziskezeléssel kapcsolatos funkciókat tartalmazza<br>
+`download.php` - a .shareon metafájlok generálásáért felelős<br>
+`footer.php` - a sablon lábléc része<br>
+`functions.php` - a listázást és a különböző lekérdezéseket megvalósító függvények<br>
+`header.php` - fejléc sablon<br>
+`index.php`  - a funkciók szétválasztását végzi<br>
 `style.css` - stíluslap
+
