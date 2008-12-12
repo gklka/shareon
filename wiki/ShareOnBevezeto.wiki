@@ -1,4 +1,5 @@
 #summary Bevezető a programról
+#labels Phase-Design,Featured
 
 = Bevezető =
 
