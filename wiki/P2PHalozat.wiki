@@ -21,7 +21,13 @@ ShareOnServer
 A szerver induláskor először bejelentkezik a Turul szerverre, ahol ellenőrzi, hogy megtalálható-e a shares nevű tábla. Amennyiben nem, létrehozza azt. (Az adatbázissal való kapcsolattartáshoz a Sun által szállított  JDBC drivert használunk.)
 Amennyiben sikeres volt a bejelentkezés a szerverre, elindul a runServer() függvény, amely létrehozza a socket-et, melyen a szerver hallgat. Ez a függvény minden peer bejelentkezése esetén egy új szálat indít, amely felelős az adott peer-el való kommunikációért.
 
-A szerver felelős az SQL adatbázis karbantartásáért, melyet a peer-ekkel való kommunikáció alapján visz véghez. A kliensekkel történő kommunikációról később. A szerver a következő függvényeket használja a szerverrel való kommunikációra:
+A szervernek a JAVA implementáción kívül tartalmaz még egy PHP összetevőt is, mely a webes felület kezeléséért felelős.
+
+TODO PHP
+
+A szerver felelős az SQL adatbázis karbantartásáért, melyet a peer-ekkel való kommunikáció alapján visz véghez. A kliensekkel történő kommunikációról később.
+
+A szerver a következő függvényeket használja a szerverrel való kommunikációra:
 
 disconnect(): Csökkenti az aktíc kapcsolatok számát, így az nem telítődik inaktív kapcsolatokkal.
 
