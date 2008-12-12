@@ -134,8 +134,8 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
         //load .shareon
         if (e.getSource() == jAddShareOnButton)
             {
-            if (ownerClient.isConnectedToServer())
-            {
+            //if (true)//ownerClient.isConnectedToServer())
+            //{
                 File fShareOn = ownerClient.chooseFile(true);
                 if (fShareOn != null)
                     {
@@ -150,10 +150,10 @@ public class ClientGUI extends javax.swing.JFrame implements ActionListener, Win
                         jResultsScrollPane.setViewportView(jResultsList);
                         }
                     }
-            } else
-            {
-                JOptionPane.showMessageDialog(this, "Please login first!", "Warning!", JOptionPane.WARNING_MESSAGE);
-            }
+            //} else
+            //{
+            //    JOptionPane.showMessageDialog(this, "Please login first!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            //}
             }
         
         //add shared file
