@@ -1,7 +1,7 @@
 #summary A PHP felület bemutatása
 #labels Phase-Implementation
 
-= Bevezető =
+= PHP felület =
 
 A PHP felület célja, hogy egy központi adatbázist használva, melyet a kliensek minden megosztás létrehozásakor frissítenek, részletes információkat szolgáltasson a letölthető tartalmakról. Ezen kívül alkalmas ezen tartalmakhoz metafájlok generálására, melyek segítségével a kliensek a letöltést megkezdhetik.
 
