@@ -24,7 +24,6 @@ A telepítés során a zip fájlt kitömörítve a fájlokat a webszerver megfel
 
 Ez után a dbfunctions.php-ban található értékeket a MySQL szerver hozzáférés alapján megfelelően ki kell tölteni:
 
-	$dbhost = 'localhost';
-	$dbuser = 'user';
+	$dbhost = 'localhost';<br>
+	$dbuser = 'user';<br>
 	$dbpass = 'pass';
-
