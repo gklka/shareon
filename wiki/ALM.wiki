@@ -1,9 +1,9 @@
 #summary Alkalmazás szintű többesadás.
+#labels Phase-Implementation
 
 = Feladat =
 
--Alkalmazás szintű többesadás (ALM - Applicaton Layer Multicast) megvalósítása.
-
+ * Alkalmazás szintű többesadás (ALM - Applicaton Layer Multicast) megvalósítása.
 
 = Az alkalmazás szintű hálózat (ALN - Application Layer Network) felépítése =
 
