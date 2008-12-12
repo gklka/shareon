@@ -34,11 +34,14 @@ A feladatban létrehozott központosított átfedő egy !MySQL alapú alkalmazá
 A szerver alkalmazás folyamatos kapcsolatban van az adatbázissal, tartalmát folyamatosan karbantartja. Regisztrálja a peer-ek feltöltéseit, valamint szükség esetén eltávolítja azokat. A szerver két összetevőből áll: egy szerver programból; valamint egy PHP kódból amely a webes felület megjelenítéséért felelős.
 
 Az adatbázisban egy "shares" nevű tábla szolgál a peer-ek megosztásainak 
-nyilvántartására, mely a következő sorokból épül fel:<br>
- PRIMARY KEY id (INTEGER) - [auto increase]<br>
- file (VARCHAR 255)<br>
- hash (VARCHAR 128)<br>
+nyilvántartására, mely a következő sorokból épül fel:
+
+{{{
+ PRIMARY KEY id (INTEGER) - [auto increase]
+ file (VARCHAR 255)
+ hash (VARCHAR 128)
  ip (VARCHAR 15) - [default = 127.0.0.1]
+}}}
 
 A peer-ek a szerver adatbázisából lekérdezve kezdhetik meg a letöltést.
 
