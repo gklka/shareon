@@ -11,6 +11,8 @@ A következő dokumentációkban leírjuk, az egyes feladatok során hozott dön
 
 A feladatot JAVA nyelven valósítottuk meg, így az elkészült szerver illetve ügyfélprogram platformfüggetlenül használható.
 
+*Ezen dokumentáció részei:*
+
  # [AlkSzHalProtTerv Alkalmazás szintű hálózati protokoll tervezése]
  # [P2PHalozat Egyenrangú Peer-to-peer hálózat létrehozása]
  # [ALM Alkalmazás szintű többesadás megvalósítása]
