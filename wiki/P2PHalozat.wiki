@@ -10,6 +10,8 @@
 
 A feladatkiírás nem jelölt meg konkrét programnyelvet, melyen a feladatot meg kellett valósítanunk, ezért a JAVA programnyelv mellett döntöttünk, mivel ez a programnyelv platformfüggetlenséget kínál felhasználói számára. A projektet Netbeans környezetben valósítottuk meg.
 
+Jelen oldalon megemlítjük már az ALN implementációval kapcsolatos megoldásokat is, azonban ezekről részletesebben a 3. feladat dokumentációjában lesz szó.
+
 = Szerver =
 
 A szerver program két osztályt foglal magába: ShareOnServer, ClientEntity
@@ -56,3 +58,61 @@ ALN peer kijelentekezése: "alnlogout@"(IP) - ALN-en kapcsoolódó peer kijelent
 Az ALN kommunikációban használt függvények a kommunikáció jellege miatt szükségesek, ugyanis az ALN segítségével továbbított üzenetek feladója nem feltétlenül egyezik az eredeti feladóval. Így megosztás, törlés, és kijelentkezés esetén szükséges megjelölni az eredeti feladót. Keresés esetén viszont ez teljesen lényegtelen, ugyanis a válasz az ALN-en visszafelé fog terjedni a feladó felé, anélkül, hogy ismernünk kellene a kérés forrását.
 
 = Kliens =
+
+A kliens 9 osztályból épül fel: ALNListener, ClientGUI, PseudoPingListener, ShareOnClient, ShareOnFileFilter, UploadListenerThread, UploadThread, DownThread, ParsedShareOn.
+
+ShareOnClient
+
+Az ügyfélprogram fő osztálya, feladata az egyes részek összefogása, a felhasználói interakció kezelése, a kommunikáció a szerverrel és a többi egyenrangúval. Indításkor példányosít 3 listenert: PseudoPingListener, ALNListener, DownThread; ezt követően pedig a ClientGUI osztályt. Miután ez megtörtént, eseményvezéreltté válik, mely eseményeket a GUI segítségével idézhetjük elő.
+
+Fontosabb függvényei:
+
+connectToServer(): A GUI által meghívva apcsolódik a szerverhez, melynek IP-je parancssori argumentumként adható meg. A kapcsolódás az 1. ábrán látható.
+
+http://users.hszk.bme.hu/~hl551/connect.png
+1. ábra: kapcsolódás a szerverhez, majd GUI frissítés
+
+connectToALN(): Kapcsolódik egy másik peer-en keresztül a szerverhez.
+
+disconnectFromServer(): Kijelentkezik a szerverről.
+
+flushConnection(): lezárja a szerver felé irányuló kapcsolatot, ez hibák esetén hasznos.
+
+chooseFile(): Fájlmegynitásokhoz használt. Shareon kliens fájlok megnyitásához külön FileFilter definiált: ShareOnFileFilter
+
+pseudoPing(): JAVA környezetben nincs dedikált ping függvény, mi pedig szükségesnek találtuk egy a pinghez hasonló implementáció használatát, melynek segítségével ismereteket szerezhetünk a többi peer-ről. Ez a függvény egy másik peer előre meghatározott portjára egy "ping" üzenetet küld, majd a válasz "pong" üzenetig eltelő időt megméri, ez lesz az adott peer-hez tartozó RTT (Round Trip Time). A pseudoping filyamatát szemlélteti az 2. ábra.
+
+http://users.hszk.bme.hu/~hl551/sendping.png
+2. ábra: A pseudoping folyamata
+
+search(): A search függvény segítéségével kereshet a peer megosztásokat a szerveren.
+
+forwardALNMessage(): Ennek a függvények a segítségével továbbítjuk az általunk fenntartott ALN-hez kapcsolódó peer-ek üzeneteit.
+
+updateShares(): A peer által egosztott állományok frissítésére szolgál.
+
+parseShareOn(): A felhasználó által megnyitott .shareon fájlt dolgozza fel, pseudoping segítségével megméri a benne található peer-ek RTT-jét, majd a találatok listáját megjeleníti a GUI-n.
+
+
+UploadListenerThread
+
+A kliens inicializálásakor indul ez a külön szál, melynek feladata a beérkező letöltési kérések figyelése.
+
+A szál futtatásáért felelős kód magja egy végtelen ciklus, mely beérkező kapcsolat esetén indít egy UpThread példányt. A futás kezdésekor nyit egy uploadSocket nevű szerver-csatolót, melyre várja a beérkező kapcsolatokat. Beérkező kapcsolat esetén a kapcsolat csatoló-leíró adataival létrehoz egy UpThread szálat. (lásd 3. ábra)
+
+http://users.hszk.bme.hu/~hl551/upload.png
+3. ábra: UploadListener működése
+
+
+UploadThread
+
+Másik klienstől érkező letöltési kérés elfogadása után indítja ezt a szálat az UploadListenerThread. Feladata a fájlfeltöltés lebonyolítása. A működés kezdetekor nyit egy adatfolyam-beolvasót a kérés elfogadáskor kapott csatoló-leíró adatok segítségével. Erre várja a letöltést kezdeményező klienstől a feltöltendő állomány nevét. Miután ez megérkezett, létrehoz egy pufferelt bemeneti folyamot, melynek segítségével a lemezről beolvassa a feltölteni kívánt állományt, fix méretű darabonként. A csatoló-leíró adatok segítségével nyit egy pufferelt kimeneti folyamot is, amelyen keresztül a beolvasott állomány-szegmenst átküldi a letöltést kezdeményező kliensnek. (lásd 3. ábra)
+
+
+DownThread
+
+Állomány letöltés kezdeményezésekor indított szál. A kliens alkalmazás grafikus felhasználói felülete kezdeményezheti a futását akkor, amikor a felhasználó a Download gombra kattint, miután kiválasztotta a keresési eredményeket tartalmazó listából a megfelelő letöltendő állományt. Futása során a szervertől kapott hálózati azonosítóval rendelkező kliens beérkező letöltési igényeket figyelő csatolójának segítségével felépíti a kapcsolatot. Ezután nyit egy adatfolyam-írót, és átküldi a letölteni kívánt állomány nevét (melyet a szervertől kapott). Ha ez megtörtént, akkor létrehoz egy pufferelt bemeneti folyamot, egy pufferelt kimeneti folyamot is, és egy adatfolyam-írót. Végül az adatfolyam-író és a kimeneti folyam segítségével a bemeneti folyamon érkező, fix méretű adatcsomagokat állománnyá fűzve a lemezre írja. (lásd 4. ábra)
+
+http://users.hszk.bme.hu/~hl551/download.png
+4. ábra: DownThread működése
+
