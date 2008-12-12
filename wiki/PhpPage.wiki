@@ -34,10 +34,23 @@ A szerver ezután a szerverbeállításoknak megfelelően, az index.php megnyit�
 
 http://turul.eet.bme.hu/~mk0804/shareon/index.php
 
+== Megosztás-listázás==
+
 A főoldalon a szerverre bejelentett megosztások találhatóak egy listában. A táblázat a fájlok neveit, a "Seederek", vagyis felöltő felhasználók számát, valamint egy letöltési link oszlopot tartalmazza.
+
+== Megosztó listázás==
 
 A Seederek számára kattintva láthatóvá válik a megosztás száma, az adott megosztó kliens IP-je, valamint egy link, mely az adott kliens által még megosztott fájlok száma.
 
+== Fájl listázás==
+
 Ez utóbbi linkre kattintva egy táblázatot kapunk, mely az adott kliens által megosztott fájlokat tartalmazza, valamint a fájlokat megosztó többi felhasználó számát.
 
+==Letöltés==
+
 A letöltés linkre kattintva a szerver egy .shareon fájlt generál, melyben a letöltéshez szükséges adatok találhatóak meg. Ezt a fájlt a klienssel megnyitva megkezdhető a letöltés.
+
+= Működés =
+
+Az index.php betölti indulásakor a beállításokat, valamint a működéshez szükséges függvények implementációit a megfelelő fájlokból, majd kiírja a sablon fejlécét. Ezek után az m HTTP GET változó értékétől függően megosztás-listázás-, megosztó listázás- ill. fájllistázás módba lépünk, és a megfelelő függvényt meghívjuk. Végül a sablon végét kiírva a HTML oldalt lezárjuk.
+
