@@ -24,9 +24,11 @@ A telepítés során a zip fájlt kitömörítve a fájlokat a webszerver megfel
 
 Ez után a dbfunctions.php-ban található értékeket a MySQL szerver hozzáférés alapján megfelelően ki kell tölteni:
 
- $dbhost = 'localhost';<br>
- $dbuser = 'user';<br>
+ {{{
+ $dbhost = 'localhost';
+ $dbuser = 'user';
  $dbpass = 'pass';
+ }}}
 
 = Használat =
 
@@ -53,4 +55,3 @@ A letöltés linkre kattintva a szerver egy .shareon fájlt generál, melyben a 
 = Működés =
 
 Az index.php betölti indulásakor a beállításokat, valamint a működéshez szükséges függvények implementációit a megfelelő fájlokból, majd kiírja a sablon fejlécét. Ezek után az m HTTP GET változó értékétől függően megosztás-listázás-, megosztó listázás- ill. fájllistázás módba lépünk, és a megfelelő függvényt meghívjuk. Végül a sablon végét kiírva a HTML oldalt lezárjuk.
-
