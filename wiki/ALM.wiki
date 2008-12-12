@@ -1,0 +1,8 @@
+#summary Alkalmazás szintű többesadás.
+
+= Feladat =
+
+-Alkalmazás szintű többesadás megvalósítása.
+
+
+= Az alkalmazás szintű hálózat (ALN) felépítése =
