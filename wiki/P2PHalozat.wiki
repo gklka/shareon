@@ -127,7 +127,7 @@ A !ShareOnclient osztály indítás után példányosítja. Ezt követően figye
 http://users.hszk.bme.hu/~hl551/pinglistener.png
 6. ábra: PseudoPingListener működése
 
-==!ALNListener==
+==ALNListener==
 
 A bejövő ALN csatlakozási kérések kezeléséért felelős. Részletesebb leírás a 3. feladat dokumentációjában található.
 
@@ -135,7 +135,7 @@ A bejövő ALN csatlakozási kérések kezeléséért felelős. Részletesebb le
 
 Ez az osztály az absztrakt FileFilter osztály leszármazottja. Segítségével valósul meg a .shareon kiterjesztésű fájlokra való szűrés a chooseFile FileChooser-ben.
 
-==!ClientGUI==
+==ClientGUI==
 
 A ShareOnClient ügyfélprogram felhasználói felületét tartalmazó osztály. Feladata a felhasználói interakciók kezelése. A GUI-n található JButton-ok megnyomásával, a hozzáadott ActinListener-ek segítségével a ShareOnClient különféle függvényeit hívjuk meg, így érhetőek el a kívánt funkcionalitások. A gombok a következők:
 
