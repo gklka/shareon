@@ -27,3 +27,10 @@ Ez után a dbfunctions.php-ban található értékeket a MySQL szerver hozzáfé
  $dbhost = 'localhost';<br>
  $dbuser = 'user';<br>
  $dbpass = 'pass';
+
+= Használat =
+
+A szerver ezután a szerverbeállításoknak megfelelően, az index.php megnyitásával érhető el. Konkrét feladatunk esetében ez a cím:
+
+http://turul.eet.bme.hu/~mk0804/shareon/index.php
+
