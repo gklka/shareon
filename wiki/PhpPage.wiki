@@ -1,4 +1,5 @@
 #summary A PHP felület bemutatása
+#labels Phase-Implementation
 
 = Bevezető =
 
@@ -14,4 +15,16 @@ A PHP felület célja, hogy egy központi adatbázist használva, melyet a klien
 `header.php` - fejléc sablon<br>
 `index.php`  - a funkciók szétválasztását végzi<br>
 `style.css` - stíluslap
+
+= Telepítés =
+
+Egy előre beállított HTTP szerverre van szükség PHP4 értelmezővel a szerver telepítéséhez. Rendelkeznünk kell a MySQL szerver hozzáférésével is (host, felhasználói név, jelszó).
+
+A telepítés során a zip fájlt kitömörítve a fájlokat a webszerver megfelelő könyvtárába kell másolni, mely tetszőleges lehet.
+
+Ez után a dbfunctions.php-ban található értékeket a MySQL szerver hozzáférés alapján megfelelően ki kell tölteni:
+
+	$dbhost = 'localhost';
+	$dbuser = 'user';
+	$dbpass = 'pass';
 
