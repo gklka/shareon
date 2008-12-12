@@ -1,4 +1,5 @@
 #summary Egyenrangú (P2P) hálózat létrehozása
+#labels Phase-Implementation
 
 = Feladat =
 
