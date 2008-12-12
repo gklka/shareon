@@ -22,11 +22,11 @@ Egy, a Napster program protokolljához rendkívül hasonló protokollt terveztü
 
 A protokoll kidolgozásával bővebben a P2PHalozat wikioldal foglalkozik.
 
-http://shareon.googlecode.com/files/ShareOn-protocol.png
-1. ábra: Letöltés a szerver segítségével
+http://shareon.googlecode.com/files/ShareOn%20file%20protocol_sm.png
+ 1. ábra: Letöltés a szerver segítségével
 
-http://shareon.googlecode.com/files/ShareOn%20file%20protocol.png
-2. ábra: Közvetlen letöltés
+http://shareon.googlecode.com/files/ShareOn-protocol_sm.png
+ 2. ábra: Közvetlen letöltés
 
 = A központosított átfedő =
 
