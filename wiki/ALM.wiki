@@ -2,7 +2,17 @@
 
 = Feladat =
 
--Alkalmazás szintű többesadás megvalósítása.
+-Alkalmazás szintű többesadás (ALM - Applicaton Layer Multicast) megvalósítása.
 
 
-= Az alkalmazás szintű hálózat (ALN) felépítése =
+= Az alkalmazás szintű hálózat (ALN - Application Layer Network) felépítése =
+
+Az általunk készített alkalmazás egy Napster típusú átfedő. A Napster típusú átfedőben nem szerepel ALM, a peer-ek egyenként kapcsolódnak a szerverhez, valamint a letöltések a peer-ek között zajlanak közvetlenül. A Napster-ben hiányzó ezen megoldásokvezettek a rendszer túlterheltségéghez, melyet aztán később a szerverfarmon belüli DNS rotációval igyekeztek megoldani.
+
+Mi a feladatmegvalósítás során lehetőséget biztosítottunk a peer-ek számára, hogy a szerverhez való közvetlen kapcsolódás helyett ALN-t használjanak. Ez csökkenti a terhelést a szerveren. Az ALN-re való áttérés a szerverre való bejelentkezéskor lehetséges, ekkor a szerver a peer rendelezésére bocsájt egy véletlenszerű IP-t az adatbázisból, melyhez a kliens csatlakozhat (lásd 1. ábra). Ettől kezdve a véletlenszerűen kiválasztott peer lesz a csatlakozott új peer ALN kiszolgálója, és viseli a teljes felelősséget a hozzá csatlakozott peer-ek kommunikációjáért. Ezáltal tehát a szerver-kliens kommunikáció majdnem teljes egészében ALN segítségével bonyolítható, ezáltal kivételt képeznek a szerverhez közvetlenül kapcsolódó peer-ek.
+
+http://users.hszk.bme.hu/~hl551/alm_connect.png
+<br>
+1. ábra: Peer csatlakozása a rednszerhez ALN lehetőséggel
+
+Az adott peer-hez csatlakozó peer-ek ALN csatlakozásaiért és kommunikációjáért a kliens program csomagjában megtalálható ALNListener osztály felelős. Ez az osztály a ShareOnClient indításakor példányosodik, és külön szálon figyel a bejövő ALN csatlakozási kérelmekre. Amennyiben ilyen kérés érkezik be, egy új szálat indít, melynek neve ALNThread, és amely egy ALN segítségével kapcsolódott klienssel történő kommunikációt szimbolizál.
