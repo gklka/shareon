@@ -125,7 +125,7 @@ _5. ábra: DownThread működése_
 A !ShareOnclient osztály indítás után példányosítja. Ezt követően figyeli a megadott porton bejövő "ping" üzeneteket, és ezekre "pong" üzenetekkel válaszol. Működése az 6. ábrán látható.
 
 http://users.hszk.bme.hu/~hl551/pinglistener.png <br>
-6. ábra: PseudoPingListener működése
+_6. ábra: PseudoPingListener működése_
 
 ==ALNListener==
 
