@@ -7,14 +7,14 @@ A PHP felület célja, hogy egy központi adatbázist használva, melyet a klien
 
 = Fájlok =
 
-`config.php` - a beállításokat tartalmazó fájl<br>
-`dbfunctions.php` - az adatbáziskezeléssel kapcsolatos funkciókat tartalmazza<br>
-`download.php` - a .shareon metafájlok generálásáért felelős<br>
-`footer.php` - a sablon lábléc része<br>
-`functions.php` - a listázást és a különböző lekérdezéseket megvalósító függvények<br>
-`header.php` - fejléc sablon<br>
-`index.php`  - a funkciók szétválasztását végzi<br>
-`style.css` - stíluslap
+ * `config.php` - a beállításokat tartalmazó fájl<br>
+ * `dbfunctions.php` - az adatbáziskezeléssel kapcsolatos funkciókat tartalmazza<br>
+ * `download.php` - a .shareon metafájlok generálásáért felelős<br>
+ * `footer.php` - a sablon lábléc része<br>
+ * `functions.php` - a listázást és a különböző lekérdezéseket megvalósító függvények<br>
+ * `header.php` - fejléc sablon<br>
+ * `index.php`  - a funkciók szétválasztását végzi<br>
+ * `style.css` - stíluslap
 
 = Telepítés =
 
@@ -24,6 +24,6 @@ A telepítés során a zip fájlt kitömörítve a fájlokat a webszerver megfel
 
 Ez után a dbfunctions.php-ban található értékeket a MySQL szerver hozzáférés alapján megfelelően ki kell tölteni:
 
-	$dbhost = 'localhost';<br>
-	$dbuser = 'user';<br>
-	$dbpass = 'pass';
+ $dbhost = 'localhost';<br>
+ $dbuser = 'user';<br>
+ $dbpass = 'pass';
