@@ -1,3 +1,0 @@
-#summary A webes felület tudnivalói
-
-http://turul.eet.bme.hu/~mk0804/index.php
