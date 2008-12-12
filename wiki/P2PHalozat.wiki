@@ -16,7 +16,7 @@ Jelen oldalon megemlítjük már az ALN implementációval kapcsolatos megoldás
 
 A szerver program két osztályt foglal magába: !ShareOnServer, !ClientEntity
 
-==ShareOnServer==
+==!ShareOnServer==
 
 A szerver induláskor először bejelentkezik a Turul szerverre, ahol ellenőrzi, hogy megtalálható-e a shares nevű tábla. Amennyiben nem, létrehozza azt. (Az adatbázissal való kapcsolattartáshoz a Sun által szállított  JDBC drivert használunk.)
 Amennyiben sikeres volt a bejelentkezés a szerverre, elindul a runServer() függvény, amely létrehozza a socket-et, melyen a szerver hallgat. Ez a függvény minden peer bejelentkezése esetén egy új szálat indít, amely felelős az adott peer-el való kommunikációért.
@@ -31,35 +31,34 @@ A szerver a következő függvényeket használja a szerverrel való kommunikác
 
 `disconnect()`: Csökkenti az aktíc kapcsolatok számát, így az nem telítődik inaktív kapcsolatokkal.
 
-executeUpload(): Preparedstatement segítségével beszúr egy megosztást a megosztások táblázatába.
+`executeUpload()`: Preparedstatement segítségével beszúr egy megosztást a megosztások táblázatába.
 
-executeDelete(): Preparedstatement segítségével töröl egy rekordot az adatbázisból.
+`executeDelete()`: Preparedstatement segítségével töröl egy rekordot az adatbázisból.
 
-removeClientShares(): Kijelentkezés, illetve "ungraceful departure" esetén eltávolítja az adott peer által megosztott fájlokat.
+`removeClientShares()`: Kijelentkezés, illetve "ungraceful departure" esetén eltávolítja az adott peer által megosztott fájlokat.
 
-searchFile(): keresési kérést intéz a szerverhez, majd visszatér a talált fájlokat megosztó peer-ek IP-jével, és a fájlok neveivel (#-#, és @ elválasztójelekkel)
+`searchFile()`: keresési kérést intéz a szerverhez, majd visszatér a talált fájlokat megosztó peer-ek IP-jével, és a fájlok neveivel (#-#, és @ elválasztójelekkel)
 
-getRandomClient(): Visszatér egy az adatbázisból véletlenszerűen kiválasztott peer-el (ALN esetben használt).
+`getRandomClient()`: Visszatér egy az adatbázisból véletlenszerűen kiválasztott peer-el (ALN esetben használt).
 
+==ClientEntity==
 
-ClientEntity
-
-A ClientEntity osztály felelős a peer-ekkel folytatott kommunikációért. Minden egyes ilyen osztály egy szerver-peer kapcsolatot reprezentál, és a konstruktor paramétereiként kapott változók segítségével kommunikál a szerverrel. A kommunikáció addig folyik, míg a kliens egy "logout" üzenetet nem küld, ekkor a socket-ek, és a stream-ek bezárulnak, az osztály által használt erőforrásokat pedig felszabadítja a garbage collector.
+A !ClientEntity osztály felelős a peer-ekkel folytatott kommunikációért. Minden egyes ilyen osztály egy szerver-peer kapcsolatot reprezentál, és a konstruktor paramétereiként kapott változók segítségével kommunikál a szerverrel. A kommunikáció addig folyik, míg a kliens egy "logout" üzenetet nem küld, ekkor a socket-ek, és a stream-ek bezárulnak, az osztály által használt erőforrásokat pedig felszabadítja a garbage collector.
 Ha a szerverhez egy új peer jelentkezik be, külön szálon elindul a ClientEntity osztálynak egy pédánya, mely létrehozza a szükséges stream-eket a kommunikációhoz, majd elküldi a kliensnek az IP-jét. Az IP elküldése azért szükséges, mert JAVA környezetben csak igen bonyolultan lehet megvalósítani az IP cím lekérdezését.
 
 A peer-ekkel folytatott kommunikáció szöveges üzenetekkel történik, ezek a következőek lehetnek:
 
-tartalom megosztása: "added@"(fájlnév) - A peer egy új állományt osztott meg.
+ * tartalom megosztása: "added@"(fájlnév) - A peer egy új állományt osztott meg.
 
-tartalom megosztása: "alnadded@"(fájlnév)"@"(IP) -Egy ALN-en kapcsolódó peer egy új állományt osztott meg.
+ * tartalom megosztása: "alnadded@"(fájlnév)"@"(IP) -Egy ALN-en kapcsolódó peer egy új állományt osztott meg.
 
-tartalom eltávolítása: "removed@"(fájlnév) - A peer megosztást távolított el.
+ * tartalom eltávolítása: "removed@"(fájlnév) - A peer megosztást távolított el.
 
-tartalom eltávolítása: "alnremoved@"(fájlnév)"@"(IP) - Egy ALN-en kapcsolódó peer megosztást távolított el.
+ * tartalom eltávolítása: "alnremoved@"(fájlnév)"@"(IP) - Egy ALN-en kapcsolódó peer megosztást távolított el.
 
-tartalom keresése: "search@"(fájlnév) - Tartalom keresése. ALN-en kapcsolódó peer-ek esetén ugyanez a függvény használatos.
+ * tartalom keresése: "search@"(fájlnév) - Tartalom keresése. ALN-en kapcsolódó peer-ek esetén ugyanez a függvény használatos.
 
-ALN peer kijelentekezése: "alnlogout@"(IP) - ALN-en kapcsoolódó peer kijelentkezése.
+ * ALN peer kijelentekezése: "alnlogout@"(IP) - ALN-en kapcsoolódó peer kijelentkezése.
 
 Az ALN kommunikációban használt függvények a kommunikáció jellege miatt szükségesek, ugyanis az ALN segítségével továbbított üzenetek feladója nem feltétlenül egyezik az eredeti feladóval. Így megosztás, törlés, és kijelentkezés esetén szükséges megjelölni az eredeti feladót. Keresés esetén viszont ez teljesen lényegtelen, ugyanis a válasz az ALN-en visszafelé fog terjedni a feladó felé, anélkül, hogy ismernünk kellene a kérés forrását.
 
@@ -67,89 +66,77 @@ Az ALN kommunikációban használt függvények a kommunikáció jellege miatt s
 
 A kliens 9 osztályból épül fel: ALNListener, ClientGUI, PseudoPingListener, ShareOnClient, ShareOnFileFilter, UploadListenerThread, UploadThread, DownThread, ParsedShareOn.
 
-ShareOnClient
+==!ShareOnClient==
 
 Az ügyfélprogram fő osztálya, feladata az egyes részek összefogása, a felhasználói interakció kezelése, a kommunikáció a szerverrel és a többi egyenrangúval. Indításkor példányosít 3 listenert: PseudoPingListener, ALNListener, DownThread; ezt követően pedig a ClientGUI osztályt. Miután ez megtörtént, eseményvezéreltté válik, mely eseményeket a GUI segítségével idézhetjük elő.
 
-Fontosabb függvényei:
+*Fontosabb függvényei*
 
-connectToServer(): A GUI által meghívva apcsolódik a szerverhez, melynek IP-je parancssori argumentumként adható meg. A kapcsolódás az 1. ábrán látható.
+`connectToServer()`: A GUI által meghívva apcsolódik a szerverhez, melynek IP-je parancssori argumentumként adható meg. A kapcsolódás az 1. ábrán látható.
 
 http://users.hszk.bme.hu/~hl551/connect.png
-<br>
 1. ábra: kapcsolódás a szerverhez, majd GUI frissítés
 
-connectToALN(): Kapcsolódik egy másik peer-en keresztül a szerverhez.
+`connectToALN()`: Kapcsolódik egy másik peer-en keresztül a szerverhez.
 
-disconnectFromServer(): Kijelentkezik a szerverről.
+`disconnectFromServer()`: Kijelentkezik a szerverről.
 
-flushConnection(): lezárja a szerver felé irányuló kapcsolatot, ez hibák esetén hasznos.
+`flushConnection()`: lezárja a szerver felé irányuló kapcsolatot, ez hibák esetén hasznos.
 
-chooseFile(): Fájlmegynitásokhoz használt. Shareon kliens fájlok megnyitásához külön FileFilter definiált: ShareOnFileFilter
+`chooseFile()`: Fájlmegynitásokhoz használt. Shareon kliens fájlok megnyitásához külön FileFilter definiált: !ShareOnFileFilter
 
-pseudoPing(): JAVA környezetben nincs dedikált ping függvény, mi pedig szükségesnek találtuk egy a pinghez hasonló implementáció használatát, melynek segítségével ismereteket szerezhetünk a többi peer-ről. Ez a függvény egy másik peer előre meghatározott portjára egy "ping" üzenetet küld, majd a válasz "pong" üzenetig eltelő időt megméri, ez lesz az adott peer-hez tartozó RTT (Round Trip Time). A pseudoping filyamatát szemlélteti az 2. ábra.
+`pseudoPing()`: JAVA környezetben nincs dedikált ping függvény, mi pedig szükségesnek találtuk egy a pinghez hasonló implementáció használatát, melynek segítségével ismereteket szerezhetünk a többi peer-ről. Ez a függvény egy másik peer előre meghatározott portjára egy "ping" üzenetet küld, majd a válasz "pong" üzenetig eltelő időt megméri, ez lesz az adott peer-hez tartozó RTT (Round Trip Time). A pseudoping filyamatát szemlélteti az 2. ábra.
 
 http://users.hszk.bme.hu/~hl551/sendping.png
-<br>
 2. ábra: A pseudoping folyamata
 
-search(): A search függvény segítéségével kereshet a peer megosztásokat a szerveren.
+`search()`: A search függvény segítéségével kereshet a peer megosztásokat a szerveren.
 
-forwardALNMessage(): Ennek a függvények a segítségével továbbítjuk az általunk fenntartott ALN-hez kapcsolódó peer-ek üzeneteit.
+`forwardALNMessage()`: Ennek a függvények a segítségével továbbítjuk az általunk fenntartott ALN-hez kapcsolódó peer-ek üzeneteit.
 
-updateShares(): A peer által egosztott állományok frissítésére szolgál.
+`updateShares()`: A peer által egosztott állományok frissítésére szolgál.
 
-parseShareOn(): A felhasználó által megnyitott .shareon fájlt dolgozza fel, pseudoping segítségével megméri a benne található peer-ek RTT-jét, majd a találatok listáját megjeleníti a GUI-n. (lásd 3. ábra)
+`parseShareOn()`: A felhasználó által megnyitott .shareon fájlt dolgozza fel, pseudoping segítségével megméri a benne található peer-ek RTT-jét, majd a találatok listáját megjeleníti a GUI-n. (lásd 3. ábra)
 
 http://users.hszk.bme.hu/~hl551/shareon.png
-<br>
 3. ábra: .shareon megnyitása és feldolgozása
 
-
-UploadListenerThread
+==UploadListenerThread==
 
 A kliens inicializálásakor indul ez a külön szál, melynek feladata a beérkező letöltési kérések figyelése.
 
 A szál futtatásáért felelős kód magja egy végtelen ciklus, mely beérkező kapcsolat esetén indít egy UpThread példányt. A futás kezdésekor nyit egy uploadSocket nevű szerver-csatolót, melyre várja a beérkező kapcsolatokat. Beérkező kapcsolat esetén a kapcsolat csatoló-leíró adataival létrehoz egy UpThread szálat. (lásd 4. ábra)
 
 http://users.hszk.bme.hu/~hl551/upload.png
-<br>
 4. ábra: UploadListener működése
 
-
-UploadThread
+==UploadThread==
 
 Másik klienstől érkező letöltési kérés elfogadása után indítja ezt a szálat az UploadListenerThread. Feladata a fájlfeltöltés lebonyolítása. A működés kezdetekor nyit egy adatfolyam-beolvasót a kérés elfogadáskor kapott csatoló-leíró adatok segítségével. Erre várja a letöltést kezdeményező klienstől a feltöltendő állomány nevét. Miután ez megérkezett, létrehoz egy pufferelt bemeneti folyamot, melynek segítségével a lemezről beolvassa a feltölteni kívánt állományt, fix méretű darabonként. A csatoló-leíró adatok segítségével nyit egy pufferelt kimeneti folyamot is, amelyen keresztül a beolvasott állomány-szegmenst átküldi a letöltést kezdeményező kliensnek. (lásd 4. ábra)
 
-
-DownThread
+==DownThread==
 
 Állomány letöltés kezdeményezésekor indított szál. A kliens alkalmazás grafikus felhasználói felülete kezdeményezheti a futását akkor, amikor a felhasználó a Download gombra kattint, miután kiválasztotta a keresési eredményeket tartalmazó listából a megfelelő letöltendő állományt. Futása során a szervertől kapott hálózati azonosítóval rendelkező kliens beérkező letöltési igényeket figyelő csatolójának segítségével felépíti a kapcsolatot. Ezután nyit egy adatfolyam-írót, és átküldi a letölteni kívánt állomány nevét (melyet a szervertől kapott). Ha ez megtörtént, akkor létrehoz egy pufferelt bemeneti folyamot, egy pufferelt kimeneti folyamot is, és egy adatfolyam-írót. Végül az adatfolyam-író és a kimeneti folyam segítségével a bemeneti folyamon érkező, fix méretű adatcsomagokat állománnyá fűzve a lemezre írja. (lásd 5. ábra)
 
 http://users.hszk.bme.hu/~hl551/download.png
 5. ábra: DownThread működése
 
+==PseudoPingListener==
 
-PseudoPingListener
-
-A ShareOnclient osztály indítás után példányosítja. Ezt követően figyeli a megadott porton bejövő "ping" üzeneteket, és ezekre "pong" üzenetekkel válaszol. Működése az 6. ábrán látható.
+A !ShareOnclient osztály indítás után példányosítja. Ezt követően figyeli a megadott porton bejövő "ping" üzeneteket, és ezekre "pong" üzenetekkel válaszol. Működése az 6. ábrán látható.
 
 http://users.hszk.bme.hu/~hl551/pinglistener.png
-<br>
 6. ábra: PseudoPingListener működése
 
-
-ALNListener
+==ALNListener==
 
 A bejövő ALN csatlakozási kérések kezeléséért felelős. Részletesebb leírás a 3. feladat dokumentációjában található.
 
-
-ShareOnFileFilter
+==!ShareOnFileFilter==
 
 Ez az osztály az absztrakt FileFilter osztály leszármazottja. Segítségével valósul meg a .shareon kiterjesztésű fájlokra való szűrés a chooseFile FileChooser-ben.
 
-
-ClientGUI
+==ClientGUI==
 
 A ShareOnClient ügyfélprogram felhasználói felületét tartalmazó osztály. Feladata a felhasználói interakciók kezelése. A GUI-n található JButton-ok megnyomásával, a hozzáadott ActinListener-ek segítségével a ShareOnClient különféle függvényeit hívjuk meg, így érhetőek el a kívánt funkcionalitások. A gombok a következők:
 
