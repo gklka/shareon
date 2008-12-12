@@ -39,7 +39,7 @@ A szerver a következő függvényeket használja a szerverrel való kommunikác
 
 `getRandomClient()`: Visszatér egy az adatbázisból véletlenszerűen kiválasztott peer-el (ALN esetben használt).
 
-==ClientEntity==
+==!ClientEntity==
 
 A !ClientEntity osztály felelős a peer-ekkel folytatott kommunikációért. Minden egyes ilyen osztály egy szerver-peer kapcsolatot reprezentál, és a konstruktor paramétereiként kapott változók segítségével kommunikál a szerverrel. A kommunikáció addig folyik, míg a kliens egy "logout" üzenetet nem küld, ekkor a socket-ek, és a stream-ek bezárulnak, az osztály által használt erőforrásokat pedig felszabadítja a garbage collector.
 Ha a szerverhez egy új peer jelentkezik be, külön szálon elindul a ClientEntity osztálynak egy pédánya, mely létrehozza a szükséges stream-eket a kommunikációhoz, majd elküldi a kliensnek az IP-jét. Az IP elküldése azért szükséges, mert JAVA környezetben csak igen bonyolultan lehet megvalósítani az IP cím lekérdezését.
@@ -99,7 +99,7 @@ http://users.hszk.bme.hu/~hl551/sendping.png
 http://users.hszk.bme.hu/~hl551/shareon.png
 3. ábra: .shareon megnyitása és feldolgozása
 
-==UploadListenerThread==
+==!UploadListenerThread==
 
 A kliens inicializálásakor indul ez a külön szál, melynek feladata a beérkező letöltési kérések figyelése.
 
@@ -108,25 +108,25 @@ A szál futtatásáért felelős kód magja egy végtelen ciklus, mely beérkez�
 http://users.hszk.bme.hu/~hl551/upload.png
 4. ábra: UploadListener működése
 
-==UploadThread==
+==!UploadThread==
 
 Másik klienstől érkező letöltési kérés elfogadása után indítja ezt a szálat az UploadListenerThread. Feladata a fájlfeltöltés lebonyolítása. A működés kezdetekor nyit egy adatfolyam-beolvasót a kérés elfogadáskor kapott csatoló-leíró adatok segítségével. Erre várja a letöltést kezdeményező klienstől a feltöltendő állomány nevét. Miután ez megérkezett, létrehoz egy pufferelt bemeneti folyamot, melynek segítségével a lemezről beolvassa a feltölteni kívánt állományt, fix méretű darabonként. A csatoló-leíró adatok segítségével nyit egy pufferelt kimeneti folyamot is, amelyen keresztül a beolvasott állomány-szegmenst átküldi a letöltést kezdeményező kliensnek. (lásd 4. ábra)
 
-==DownThread==
+==!DownThread==
 
 Állomány letöltés kezdeményezésekor indított szál. A kliens alkalmazás grafikus felhasználói felülete kezdeményezheti a futását akkor, amikor a felhasználó a Download gombra kattint, miután kiválasztotta a keresési eredményeket tartalmazó listából a megfelelő letöltendő állományt. Futása során a szervertől kapott hálózati azonosítóval rendelkező kliens beérkező letöltési igényeket figyelő csatolójának segítségével felépíti a kapcsolatot. Ezután nyit egy adatfolyam-írót, és átküldi a letölteni kívánt állomány nevét (melyet a szervertől kapott). Ha ez megtörtént, akkor létrehoz egy pufferelt bemeneti folyamot, egy pufferelt kimeneti folyamot is, és egy adatfolyam-írót. Végül az adatfolyam-író és a kimeneti folyam segítségével a bemeneti folyamon érkező, fix méretű adatcsomagokat állománnyá fűzve a lemezre írja. (lásd 5. ábra)
 
 http://users.hszk.bme.hu/~hl551/download.png
 5. ábra: DownThread működése
 
-==PseudoPingListener==
+==!PseudoPingListener==
 
 A !ShareOnclient osztály indítás után példányosítja. Ezt követően figyeli a megadott porton bejövő "ping" üzeneteket, és ezekre "pong" üzenetekkel válaszol. Működése az 6. ábrán látható.
 
 http://users.hszk.bme.hu/~hl551/pinglistener.png
 6. ábra: PseudoPingListener működése
 
-==ALNListener==
+==!ALNListener==
 
 A bejövő ALN csatlakozási kérések kezeléséért felelős. Részletesebb leírás a 3. feladat dokumentációjában található.
 
@@ -134,7 +134,7 @@ A bejövő ALN csatlakozási kérések kezeléséért felelős. Részletesebb le
 
 Ez az osztály az absztrakt FileFilter osztály leszármazottja. Segítségével valósul meg a .shareon kiterjesztésű fájlokra való szűrés a chooseFile FileChooser-ben.
 
-==ClientGUI==
+==!ClientGUI==
 
 A ShareOnClient ügyfélprogram felhasználói felületét tartalmazó osztály. Feladata a felhasználói interakciók kezelése. A GUI-n található JButton-ok megnyomásával, a hozzáadott ActinListener-ek segítségével a ShareOnClient különféle függvényeit hívjuk meg, így érhetőek el a kívánt funkcionalitások. A gombok a következők:
 
