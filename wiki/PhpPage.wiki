@@ -54,4 +54,6 @@ A letöltés linkre kattintva a szerver egy .shareon fájlt generál, melyben a 
 
 = Működés =
 
-Az index.php betölti indulásakor a beállításokat, valamint a működéshez szükséges függvények implementációit a megfelelő fájlokból, majd kiírja a sablon fejlécét. Ezek után az m HTTP GET változó értékétől függően megosztás-listázás-, megosztó listázás- ill. fájllistázás módba lépünk, és a megfelelő függvényt meghívjuk. Végül a sablon végét kiírva a HTML oldalt lezárjuk.
+Az index.php betölti indulásakor a beállításokat, inicializálja a MySQL kapcsolatot, valamint a működéshez szükséges függvények implementációit a megfelelő fájlokból, majd kiírja a sablon fejlécét. Ezek után az m HTTP GET változó értékétől függően megosztás-listázás-, megosztó listázás- ill. fájllistázás módba lépünk, és a megfelelő függvényt meghívjuk. Végül a sablon végét kiírva a HTML oldalt lezárjuk.
+
+A functions.php-ben lévő implementációk egy `queryDb($query, $conn)` szignójú függvény segítségével érik el az SQL szervert. A függvény előnye, hogy egyszerű használhatóságot biztosít a PHP beépített függvényei felhasználásával, valamint eleve könnyen használható formában szolgáltatja vissza a kinyert adatokat.
