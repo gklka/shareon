@@ -13,11 +13,11 @@ Az első feladat egy alkalmazási szintű hálózati protokoll tervezése volt:<
 = A protokoll =
 
 Egy, a Napster program protokolljához rendkívül hasonló protokollt terveztünk meg. Ennek a protokollnak a működése a következő pontokat foglalja magában:
-# A fájlokat a kliensek (továbbiakban peer-ek) osztják meg, egyik sem található meg közvetlenül a szerveren.
-# A megosztott fájlokat a központi kiszolgáló tartja nyilván egy SQL adatbázisban.
-# A peer-ek bejelentkeznek a szerverre, majd ezután elkezdhetik megosztani az általuk birtokolt tartalmakat, melyeket a szerver rögzít.
-# Amennyiben kérés érkezik a szerverhez, az megkeresi a keresett fájlt az adatbázisban, és válaszol a kereső peer-nek az eredménnyel / eredményekkel. A letöltés ezt követően a peer-ek között zajlik(lásd 1. ábra).
-# Lehetőség van egy állományt szerver nélkül is letölteni, amennyiben a letöltő peer rendelkezik a letöltendő fájl elérési információjával(lásd 2. ábra).
+ # A fájlokat a kliensek (továbbiakban peer-ek) osztják meg, egyik sem található meg közvetlenül a szerveren.
+ # A megosztott fájlokat a központi kiszolgáló tartja nyilván egy SQL adatbázisban.
+ # A peer-ek bejelentkeznek a szerverre, majd ezután elkezdhetik megosztani az általuk birtokolt tartalmakat, melyeket a szerver rögzít.
+ # Amennyiben kérés érkezik a szerverhez, az megkeresi a keresett fájlt az adatbázisban, és válaszol a kereső peer-nek az eredménnyel / eredményekkel. A letöltés ezt követően a peer-ek között zajlik(lásd 1. ábra).
+ # Lehetőség van egy állományt szerver nélkül is letölteni, amennyiben a letöltő peer rendelkezik a letöltendő fájl elérési információjával(lásd 2. ábra).
 
 A protokoll kidolgozásával bővebben a P2PHalozat wikioldal foglalkozik.
 
