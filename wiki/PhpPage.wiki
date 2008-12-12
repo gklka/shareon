@@ -34,3 +34,10 @@ A szerver ezután a szerverbeállításoknak megfelelően, az index.php megnyit�
 
 http://turul.eet.bme.hu/~mk0804/shareon/index.php
 
+A főoldalon a szerverre bejelentett megosztások találhatóak egy listában. A táblázat a fájlok neveit, a "Seederek", vagyis felöltő felhasználók számát, valamint egy letöltési link oszlopot tartalmazza.
+
+A Seederek számára kattintva láthatóvá válik a megosztás száma, az adott megosztó kliens IP-je, valamint egy link, mely az adott kliens által még megosztott fájlok száma.
+
+Ez utóbbi linkre kattintva egy táblázatot kapunk, mely az adott kliens által megosztott fájlokat tartalmazza, valamint a fájlokat megosztó többi felhasználó számát.
+
+A letöltés linkre kattintva a szerver egy .shareon fájlt generál, melyben a letöltéshez szükséges adatok találhatóak meg. Ezt a fájlt a klienssel megnyitva megkezdhető a letöltés.
