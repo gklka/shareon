@@ -70,6 +70,7 @@ Fontosabb függvényei:
 connectToServer(): A GUI által meghívva apcsolódik a szerverhez, melynek IP-je parancssori argumentumként adható meg. A kapcsolódás az 1. ábrán látható.
 
 http://users.hszk.bme.hu/~hl551/connect.png
+<br>
 1. ábra: kapcsolódás a szerverhez, majd GUI frissítés
 
 connectToALN(): Kapcsolódik egy másik peer-en keresztül a szerverhez.
@@ -83,6 +84,7 @@ chooseFile(): Fájlmegynitásokhoz használt. Shareon kliens fájlok megnyitás�
 pseudoPing(): JAVA környezetben nincs dedikált ping függvény, mi pedig szükségesnek találtuk egy a pinghez hasonló implementáció használatát, melynek segítségével ismereteket szerezhetünk a többi peer-ről. Ez a függvény egy másik peer előre meghatározott portjára egy "ping" üzenetet küld, majd a válasz "pong" üzenetig eltelő időt megméri, ez lesz az adott peer-hez tartozó RTT (Round Trip Time). A pseudoping filyamatát szemlélteti az 2. ábra.
 
 http://users.hszk.bme.hu/~hl551/sendping.png
+<br>
 2. ábra: A pseudoping folyamata
 
 search(): A search függvény segítéségével kereshet a peer megosztásokat a szerveren.
@@ -91,28 +93,67 @@ forwardALNMessage(): Ennek a függvények a segítségével továbbítjuk az ál
 
 updateShares(): A peer által egosztott állományok frissítésére szolgál.
 
-parseShareOn(): A felhasználó által megnyitott .shareon fájlt dolgozza fel, pseudoping segítségével megméri a benne található peer-ek RTT-jét, majd a találatok listáját megjeleníti a GUI-n.
+parseShareOn(): A felhasználó által megnyitott .shareon fájlt dolgozza fel, pseudoping segítségével megméri a benne található peer-ek RTT-jét, majd a találatok listáját megjeleníti a GUI-n. (lásd 3. ábra)
+
+http://users.hszk.bme.hu/~hl551/shareon.png
+<br>
+3. ábra: .shareon megnyitása és feldolgozása
 
 
 UploadListenerThread
 
 A kliens inicializálásakor indul ez a külön szál, melynek feladata a beérkező letöltési kérések figyelése.
 
-A szál futtatásáért felelős kód magja egy végtelen ciklus, mely beérkező kapcsolat esetén indít egy UpThread példányt. A futás kezdésekor nyit egy uploadSocket nevű szerver-csatolót, melyre várja a beérkező kapcsolatokat. Beérkező kapcsolat esetén a kapcsolat csatoló-leíró adataival létrehoz egy UpThread szálat. (lásd 3. ábra)
+A szál futtatásáért felelős kód magja egy végtelen ciklus, mely beérkező kapcsolat esetén indít egy UpThread példányt. A futás kezdésekor nyit egy uploadSocket nevű szerver-csatolót, melyre várja a beérkező kapcsolatokat. Beérkező kapcsolat esetén a kapcsolat csatoló-leíró adataival létrehoz egy UpThread szálat. (lásd 4. ábra)
 
 http://users.hszk.bme.hu/~hl551/upload.png
-3. ábra: UploadListener működése
+<br>
+4. ábra: UploadListener működése
 
 
 UploadThread
 
-Másik klienstől érkező letöltési kérés elfogadása után indítja ezt a szálat az UploadListenerThread. Feladata a fájlfeltöltés lebonyolítása. A működés kezdetekor nyit egy adatfolyam-beolvasót a kérés elfogadáskor kapott csatoló-leíró adatok segítségével. Erre várja a letöltést kezdeményező klienstől a feltöltendő állomány nevét. Miután ez megérkezett, létrehoz egy pufferelt bemeneti folyamot, melynek segítségével a lemezről beolvassa a feltölteni kívánt állományt, fix méretű darabonként. A csatoló-leíró adatok segítségével nyit egy pufferelt kimeneti folyamot is, amelyen keresztül a beolvasott állomány-szegmenst átküldi a letöltést kezdeményező kliensnek. (lásd 3. ábra)
+Másik klienstől érkező letöltési kérés elfogadása után indítja ezt a szálat az UploadListenerThread. Feladata a fájlfeltöltés lebonyolítása. A működés kezdetekor nyit egy adatfolyam-beolvasót a kérés elfogadáskor kapott csatoló-leíró adatok segítségével. Erre várja a letöltést kezdeményező klienstől a feltöltendő állomány nevét. Miután ez megérkezett, létrehoz egy pufferelt bemeneti folyamot, melynek segítségével a lemezről beolvassa a feltölteni kívánt állományt, fix méretű darabonként. A csatoló-leíró adatok segítségével nyit egy pufferelt kimeneti folyamot is, amelyen keresztül a beolvasott állomány-szegmenst átküldi a letöltést kezdeményező kliensnek. (lásd 4. ábra)
 
 
 DownThread
 
-Állomány letöltés kezdeményezésekor indított szál. A kliens alkalmazás grafikus felhasználói felülete kezdeményezheti a futását akkor, amikor a felhasználó a Download gombra kattint, miután kiválasztotta a keresési eredményeket tartalmazó listából a megfelelő letöltendő állományt. Futása során a szervertől kapott hálózati azonosítóval rendelkező kliens beérkező letöltési igényeket figyelő csatolójának segítségével felépíti a kapcsolatot. Ezután nyit egy adatfolyam-írót, és átküldi a letölteni kívánt állomány nevét (melyet a szervertől kapott). Ha ez megtörtént, akkor létrehoz egy pufferelt bemeneti folyamot, egy pufferelt kimeneti folyamot is, és egy adatfolyam-írót. Végül az adatfolyam-író és a kimeneti folyam segítségével a bemeneti folyamon érkező, fix méretű adatcsomagokat állománnyá fűzve a lemezre írja. (lásd 4. ábra)
+Állomány letöltés kezdeményezésekor indított szál. A kliens alkalmazás grafikus felhasználói felülete kezdeményezheti a futását akkor, amikor a felhasználó a Download gombra kattint, miután kiválasztotta a keresési eredményeket tartalmazó listából a megfelelő letöltendő állományt. Futása során a szervertől kapott hálózati azonosítóval rendelkező kliens beérkező letöltési igényeket figyelő csatolójának segítségével felépíti a kapcsolatot. Ezután nyit egy adatfolyam-írót, és átküldi a letölteni kívánt állomány nevét (melyet a szervertől kapott). Ha ez megtörtént, akkor létrehoz egy pufferelt bemeneti folyamot, egy pufferelt kimeneti folyamot is, és egy adatfolyam-írót. Végül az adatfolyam-író és a kimeneti folyam segítségével a bemeneti folyamon érkező, fix méretű adatcsomagokat állománnyá fűzve a lemezre írja. (lásd 5. ábra)
 
 http://users.hszk.bme.hu/~hl551/download.png
-4. ábra: DownThread működése
+5. ábra: DownThread működése
 
+
+PseudoPingListener
+
+A ShareOnclient osztály indítás után példányosítja. Ezt követően figyeli a megadott porton bejövő "ping" üzeneteket, és ezekre "pong" üzenetekkel válaszol. Működése az 6. ábrán látható.
+
+http://users.hszk.bme.hu/~hl551/pinglistener.png
+<br>
+6. ábra: PseudoPingListener működése
+
+
+ALNListener
+
+A bejövő ALN csatlakozási kérések kezeléséért felelős. Részletesebb leírás a 3. feladat dokumentációjában található.
+
+
+ShareOnFileFilter
+
+Ez az osztály az absztrakt FileFilter osztály leszármazottja. Segítségével valósul meg a .shareon kiterjesztésű fájlokra való szűrés a chooseFile FileChooser-ben.
+
+
+ClientGUI
+
+A ShareOnClient ügyfélprogram felhasználói felületét tartalmazó osztály. Feladata a felhasználói interakciók kezelése. A GUI-n található JButton-ok megnyomásával, a hozzáadott ActinListener-ek segítségével a ShareOnClient különféle függvényeit hívjuk meg, így érhetőek el a kívánt funkcionalitások. A gombok a következők:
+
+jSearchButton: A szerveren való keresésre szolgál.
+jLoginButton: A szerverre való bejelentkezésre szolgál.
+jLogoutButton: A szerverről való kijelentkezésre szolgál.
+jAddShareonButton: .shareon fájl megynyitására szolgál.
+jAddShareButton: Fájlmegosztás hozzáadására szolgál.
+jRemoveShareButton: Fájlmegosztás eltávolítására szolgál.
+
+A GUI 4 részre tagolható: A bal felső részen találhatóak a szerverrel kapcsolatos funkciók, jobb felül pedig a klienssel kapcsolatosak. Alul bal oldalt található az éppen aktuális peer-ek listája (keresési eredmények peer-jei és állományaik, .shareon feldolgozásból nyert peer-ek és állományaik), jpbb alul pedig az aktuálisan megosztott fájlok listája.
+
+A működés közben fellépő értesítéseket, hibákat különféle felugró JOptionPane dialógusok tudatják a felhasználóval.
