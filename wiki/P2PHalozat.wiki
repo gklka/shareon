@@ -2,9 +2,9 @@
 
 = Feladat =
 
--A fájlcserélő rendszer központi kiszolgálójának és ügyfélprogramjának elkészítése<br>
--A központi kiszolgáló egy webes felületű MySQL alapú linuxos szoftver<br>
--Ügyfélszoftvernek Windows XP-n kell tudni működni<br>
+ * A fájlcserélő rendszer központi kiszolgálójának és ügyfélprogramjának elkészítése<br>
+ * A központi kiszolgáló egy webes felületű MySQL alapú linuxos szoftver<br>
+ * Ügyfélszoftvernek Windows XP-n kell tudni működni<br>
 
 = A szerver és a kliens alkalmazások =
 
@@ -14,22 +14,22 @@ Jelen oldalon megemlítjük már az ALN implementációval kapcsolatos megoldás
 
 = Szerver =
 
-A szerver program két osztályt foglal magába: ShareOnServer, ClientEntity
+A szerver program két osztályt foglal magába: !ShareOnServer, !ClientEntity
 
-ShareOnServer
+==ShareOnServer==
 
 A szerver induláskor először bejelentkezik a Turul szerverre, ahol ellenőrzi, hogy megtalálható-e a shares nevű tábla. Amennyiben nem, létrehozza azt. (Az adatbázissal való kapcsolattartáshoz a Sun által szállított  JDBC drivert használunk.)
 Amennyiben sikeres volt a bejelentkezés a szerverre, elindul a runServer() függvény, amely létrehozza a socket-et, melyen a szerver hallgat. Ez a függvény minden peer bejelentkezése esetén egy új szálat indít, amely felelős az adott peer-el való kommunikációért.
 
 A szervernek a JAVA implementáción kívül tartalmaz még egy PHP összetevőt is, mely a webes felület kezeléséért felelős.
 
-TODO PHP
+==PHP==
 
 A szerver felelős az SQL adatbázis karbantartásáért, melyet a peer-ekkel való kommunikáció alapján visz véghez. A kliensekkel történő kommunikációról később.
 
 A szerver a következő függvényeket használja a szerverrel való kommunikációra:
 
-disconnect(): Csökkenti az aktíc kapcsolatok számát, így az nem telítődik inaktív kapcsolatokkal.
+`disconnect()`: Csökkenti az aktíc kapcsolatok számát, így az nem telítődik inaktív kapcsolatokkal.
 
 executeUpload(): Preparedstatement segítségével beszúr egy megosztást a megosztások táblázatába.
 
