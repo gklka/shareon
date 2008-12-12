@@ -10,3 +10,8 @@ A szerver-kliens, kliens-kliens kommunikáció TCP/IP alapú. A lehetőség kise
 A következő dokumentációkban leírjuk, az egyes feladatok során hozott döntéseket, alkalmazott alapelveket, valamint a feladatok megvalósítását.
 
 A feladatot JAVA nyelven valósítottuk meg, így az elkészült szerver illetve ügyfélprogram platformfüggetlenül használható.
+
+ # [AlkSzHalProtTerv Alkalmazás szintű hálózati protokoll tervezése]
+ # [P2PHalozat Egyenrangú Peer-to-peer hálózat létrehozása]
+ # [ALM Alkalmazás szintű többesadás megvalósítása]
+ # [PhpPage A PHP felület bemutatása]
