@@ -1,4 +1,5 @@
 #summary Alkalmazási szintű hálózati protokoll tervezése
+#sidebar TableOfContents
 
 = Feladat =
 
@@ -34,10 +35,10 @@ A szerver alkalmazás folyamatos kapcsolatban van az adatbázissal, tartalmát f
 
 Az adatbázisban egy "shares" nevű tábla szolgál a peer-ek megosztásainak 
 nyilvántartására, mely a következő sorokból épül fel:<br>
- {{{PRIMARY KEY id (INTEGER) - [auto increase]<br>
+ PRIMARY KEY id (INTEGER) - [auto increase]<br>
  file (VARCHAR 255)<br>
  hash (VARCHAR 128)<br>
- ip (VARCHAR 15) - [default = 127.0.0.1]}}}
+ ip (VARCHAR 15) - [default = 127.0.0.1]
 
 A peer-ek a szerver adatbázisából lekérdezve kezdhetik meg a letöltést.
 
