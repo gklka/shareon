@@ -73,7 +73,7 @@ Az ügyfélprogram fő osztálya, feladata az egyes részek összefogása, a fel
 
 `connectToServer()`: A GUI által meghívva apcsolódik a szerverhez, melynek IP-je parancssori argumentumként adható meg. A kapcsolódás az 1. ábrán látható.
 
-http://users.hszk.bme.hu/~hl551/connect.png
+http://users.hszk.bme.hu/~hl551/connect.png <br>
 1. ábra: kapcsolódás a szerverhez, majd GUI frissítés
 
 `connectToALN()`: Kapcsolódik egy másik peer-en keresztül a szerverhez.
@@ -86,7 +86,7 @@ http://users.hszk.bme.hu/~hl551/connect.png
 
 `pseudoPing()`: JAVA környezetben nincs dedikált ping függvény, mi pedig szükségesnek találtuk egy a pinghez hasonló implementáció használatát, melynek segítségével ismereteket szerezhetünk a többi peer-ről. Ez a függvény egy másik peer előre meghatározott portjára egy "ping" üzenetet küld, majd a válasz "pong" üzenetig eltelő időt megméri, ez lesz az adott peer-hez tartozó RTT (Round Trip Time). A pseudoping filyamatát szemlélteti az 2. ábra.
 
-http://users.hszk.bme.hu/~hl551/sendping.png
+http://users.hszk.bme.hu/~hl551/sendping.png <br>
 2. ábra: A pseudoping folyamata
 
 `search()`: A search függvény segítéségével kereshet a peer megosztásokat a szerveren.
@@ -97,7 +97,7 @@ http://users.hszk.bme.hu/~hl551/sendping.png
 
 `parseShareOn()`: A felhasználó által megnyitott .shareon fájlt dolgozza fel, pseudoping segítségével megméri a benne található peer-ek RTT-jét, majd a találatok listáját megjeleníti a GUI-n. (lásd 3. ábra)
 
-http://users.hszk.bme.hu/~hl551/shareon.png
+http://users.hszk.bme.hu/~hl551/shareon.png <br>
 3. ábra: .shareon megnyitása és feldolgozása
 
 ==!UploadListenerThread==
@@ -106,7 +106,7 @@ A kliens inicializálásakor indul ez a külön szál, melynek feladata a beérk
 
 A szál futtatásáért felelős kód magja egy végtelen ciklus, mely beérkező kapcsolat esetén indít egy UpThread példányt. A futás kezdésekor nyit egy uploadSocket nevű szerver-csatolót, melyre várja a beérkező kapcsolatokat. Beérkező kapcsolat esetén a kapcsolat csatoló-leíró adataival létrehoz egy UpThread szálat. (lásd 4. ábra)
 
-http://users.hszk.bme.hu/~hl551/upload.png
+http://users.hszk.bme.hu/~hl551/upload.png <br>
 4. ábra: UploadListener működése
 
 ==!UploadThread==
@@ -117,14 +117,14 @@ Másik klienstől érkező letöltési kérés elfogadása után indítja ezt a 
 
 Állomány letöltés kezdeményezésekor indított szál. A kliens alkalmazás grafikus felhasználói felülete kezdeményezheti a futását akkor, amikor a felhasználó a Download gombra kattint, miután kiválasztotta a keresési eredményeket tartalmazó listából a megfelelő letöltendő állományt. Futása során a szervertől kapott hálózati azonosítóval rendelkező kliens beérkező letöltési igényeket figyelő csatolójának segítségével felépíti a kapcsolatot. Ezután nyit egy adatfolyam-írót, és átküldi a letölteni kívánt állomány nevét (melyet a szervertől kapott). Ha ez megtörtént, akkor létrehoz egy pufferelt bemeneti folyamot, egy pufferelt kimeneti folyamot is, és egy adatfolyam-írót. Végül az adatfolyam-író és a kimeneti folyam segítségével a bemeneti folyamon érkező, fix méretű adatcsomagokat állománnyá fűzve a lemezre írja. (lásd 5. ábra)
 
-http://users.hszk.bme.hu/~hl551/download.png
+http://users.hszk.bme.hu/~hl551/download.png <br>
 5. ábra: DownThread működése
 
 ==!PseudoPingListener==
 
 A !ShareOnclient osztály indítás után példányosítja. Ezt követően figyeli a megadott porton bejövő "ping" üzeneteket, és ezekre "pong" üzenetekkel válaszol. Működése az 6. ábrán látható.
 
-http://users.hszk.bme.hu/~hl551/pinglistener.png
+http://users.hszk.bme.hu/~hl551/pinglistener.png <br>
 6. ábra: PseudoPingListener működése
 
 ==ALNListener==
