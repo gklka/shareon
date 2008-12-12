@@ -31,7 +31,7 @@ http://shareon.googlecode.com/files/ShareOn%20file%20protocol.png
 = A központosított átfedő =
 
 A feladatban létrehozott központosított átfedő egy MySQL alapú alkalmazás. A MySQL adatbázisban kerülnek nyilvántartásra a peer-ek által megosztott fájlok. Az adatbázis az EET tanszék Turul nevű gazdagépén található, itt fog majd futni a szerver alkalmazás is.
-A szerver alkalmazás folyamatos kapcsolatban van az adatbázissal, tartalmát folyamatosan karbantartja. Regisztrálja a peer-ek feltöltéseit, valamint szükség esetén eltávolítja azokat.
+A szerver alkalmazás folyamatos kapcsolatban van az adatbázissal, tartalmát folyamatosan karbantartja. Regisztrálja a peer-ek feltöltéseit, valamint szükség esetén eltávolítja azokat. A szerver két összetevőből áll: egy szerver programból; valamint egy PHP kódból amely a webes felület megjelenítéséért felelős.
 
 Az adatbázisban egy "shares" nevű tábla szolgál a peer-ek megosztásainak 
 nyilvántartására, mely a következő sorokból épül fel:<br>
@@ -41,3 +41,6 @@ hash (VARCHAR 128)<br>
 ip (VARCHAR 15) - [default = 127.0.0.1]<br>
 
 A peer-ek a szerver adatbázisából lekérdezve kezdhetik meg a letöltést.
+
+A központosított átfedő által használt MySQL adatbázishoz a szerver két összetevője a következőképp férhet hozzá:
+http://shareon.googlecode.com/files/SQL-PHP%2CServer%20kommunikacio.png
