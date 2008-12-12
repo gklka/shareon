@@ -43,4 +43,4 @@ nyilvántartására, mely a következő sorokból épül fel:<br>
 A peer-ek a szerver adatbázisából lekérdezve kezdhetik meg a letöltést.
 
 A központosított átfedő által használt MySQL adatbázishoz a szerver két összetevője a következőképp férhet hozzá:
-http://shareon.googlecode.com/files/SQL-PHP%2CServer%20kommunikacio.png
+http://shareon.googlecode.com/files/SQL-PHP%2CServer%20kommunikacio_sm.png
